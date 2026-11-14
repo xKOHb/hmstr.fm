@@ -18,9 +18,11 @@
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:transparent;color:#fff;font-family:system-ui,"Segoe UI",Roboto,sans-serif}
 body.green{background:#00ff00}
-.logo{position:absolute;left:3vw;top:4vh;font-weight:900;font-size:30px;letter-spacing:1px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+/* сцена фиксированного размера 1920×1080, масштабируется пропорционально (без искажений) */
+#st{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden}
+.logo{position:absolute;left:56px;top:40px;font-weight:900;font-size:34px;letter-spacing:1px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .logo b{background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.wrap{position:absolute;left:3vw;bottom:5vh}
+.wrap{position:absolute;left:56px;bottom:56px}
 .card{position:relative;display:flex;align-items:center;padding:16px 30px 16px 16px;min-width:560px;max-width:920px;background:var(--card);border:2px solid color-mix(in srgb,var(--ac) 65%,transparent);border-radius:28px;box-shadow:0 0 44px -8px var(--ac),0 14px 40px rgba(0,0,0,.45);backdrop-filter:blur(10px);opacity:0;transform:translateX(-130%)}
 .card.in{animation:sin .9s cubic-bezier(.2,1.25,.4,1) forwards}
 .card.out{animation:sout .55s ease-in forwards}
@@ -35,6 +37,9 @@ body.green{background:#00ff00}
 .disc{position:absolute;z-index:1;right:-48px;top:12px;width:126px;height:126px;border-radius:50%;background:radial-gradient(circle,var(--ac) 0 14%,#111 15% 17%,transparent 18%),repeating-radial-gradient(circle,#0b0b0b 0 3px,#1d1d1d 4px 5px);box-shadow:0 0 22px -4px var(--ac);animation:spin 3.5s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .txt{margin-left:62px;min-width:0;flex:1}
+/* когда справа показано окно с клипом/обложкой, обложка в карточке не нужна */
+.card.nc .cover{display:none}
+.card.nc .txt{margin-left:14px}
 .kick{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:800;letter-spacing:3px;color:var(--ac2);text-transform:uppercase}
 .eq{display:flex;gap:3px;align-items:flex-end;height:18px}.eq i{width:4px;background:linear-gradient(var(--ac2),var(--ac));border-radius:2px;animation:eq .9s ease-in-out infinite alternate}
 .eq i:nth-child(2){animation-delay:-.3s}.eq i:nth-child(3){animation-delay:-.6s}.eq i:nth-child(4){animation-delay:-.15s}
@@ -49,30 +54,57 @@ body.green{background:#00ff00}
 @keyframes ring{from{transform:scale(1);opacity:1}to{transform:scale(2.6);opacity:0}}
 .rating.hot{animation:stamp .65s cubic-bezier(.2,1.8,.4,1) forwards,pulse 1.2s .7s ease-in-out infinite alternate}
 @keyframes pulse{to{transform:scale(1.12) rotate(8deg)}}
-.queue{position:absolute;right:3vw;top:4vh;width:380px;background:var(--card);border:2px solid color-mix(in srgb,var(--ac) 40%,transparent);border-radius:22px;padding:14px 20px;backdrop-filter:blur(10px);opacity:0;transform:translateX(30px);transition:.5s}
+.queue{position:absolute;right:56px;top:40px;width:420px;background:var(--card);border:2px solid color-mix(in srgb,var(--ac) 40%,transparent);border-radius:22px;padding:14px 20px;backdrop-filter:blur(10px);opacity:0;transform:translateX(30px);transition:.5s}
 .queue.show{opacity:1;transform:none}
 .queue h4{margin:0 0 8px;font-size:13px;letter-spacing:2.5px;color:var(--ac2);text-transform:uppercase}
 .q{font-size:20px;padding:5px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:qin .5s backwards}
 .q span{color:var(--ac);font-weight:800;margin-right:8px}
 @keyframes qin{from{opacity:0;transform:translateX(20px)}}
-.conf{position:fixed;top:-30px;width:11px;height:18px;border-radius:2px;animation:fall linear forwards;z-index:9}
-@keyframes fall{to{transform:translateY(112vh) rotate(720deg)}}
+/* окно клипа / обложки */
+.clip{position:absolute;display:none;width:var(--cw,800px);aspect-ratio:16/9;border-radius:26px;border:3px solid color-mix(in srgb,var(--ac) 70%,transparent);background:#000;box-shadow:0 0 44px -8px var(--ac),0 14px 40px rgba(0,0,0,.5);overflow:hidden;opacity:0;transform:translateY(40px) scale(.96);transition:opacity .6s,transform .7s cubic-bezier(.2,1.2,.4,1);pointer-events:none}
+#st.hasclip .clip{display:block}
+.clip.show{opacity:1;transform:none}
+[data-cp=br] .clip{right:56px;bottom:56px}
+[data-cp=bl] .clip{left:56px;bottom:270px}
+[data-cp=tr] .clip{right:56px;top:250px}
+[data-cp=tl] .clip{left:56px;top:120px}
+[data-cp=c] .clip{left:50%;top:50%;margin-left:calc(var(--cw,800px) / -2);margin-top:calc(var(--cw,800px) * -9 / 32)}
+[data-cp=c] .clip.show{transform:none}
+.cimg{position:absolute;inset:0}
+.cimg img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.cimg .bg{object-fit:cover;filter:blur(28px) brightness(.55);transform:scale(1.25)}
+.cimg .fg{object-fit:contain}
+.cimg .ph{position:absolute;inset:0;background:linear-gradient(135deg,var(--ac),var(--ac2));display:grid;place-items:center;font-size:150px}
+.cvid{position:absolute;inset:0;opacity:0;transition:opacity .5s;background:#000}
+.cvid.on{opacity:1}
+.cvid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.conf{position:absolute;top:-30px;width:11px;height:18px;border-radius:2px;animation:fall linear forwards;z-index:9}
+@keyframes fall{to{transform:translateY(1120px) rotate(720deg)}}
 </style>
 </head>
 <body>
+<div id="st">
 <div class="logo" id="logo">HMSTR<b>.FM</b></div>
+<div class="clip" id="clip"><div class="cimg" id="cimg"></div><div class="cvid" id="cvid"><div id="yt"></div></div></div>
 <div class="wrap"><div class="card" id="card">
   <div class="cover"><div class="disc"></div><div id="cv"></div></div>
   <div class="txt"><div class="kick"><span class="eq"><i></i><i></i><i></i><i></i></span>Сейчас играет</div><div class="title" id="ttl"></div><div class="by" id="by"></div></div>
   <div class="rating" id="rt"></div>
 </div></div>
 <div class="queue" id="q"><h4>Далее в эфире</h4><div id="ql"></div></div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="sfx.js"></script>
 <script>
 const P=new URLSearchParams(location.search),$=id=>document.getElementById(id);
 if(P.get("bg")==="green")document.body.classList.add("green");
 if(P.get("logo")==="0")$("logo").style.display="none";
+/* параметры клипа: ?clip=0 — выключить; ?cp=br|bl|tr|tl|c — положение; ?cw=800 — ширина окна в пикселях сцены 1920×1080 */
+const CLIP=P.get("clip")!=="0",STG=$("st");
+STG.dataset.cp=["br","bl","tr","tl","c"].includes(P.get("cp"))?P.get("cp"):"br";
+if(CLIP){STG.classList.add("hasclip");$("card").classList.add("nc");const w=parseInt(P.get("cw"),10);if(w)STG.style.setProperty("--cw",Math.max(320,Math.min(1400,w))+"px")}
+function fit(){const k=Math.min(innerWidth/1920,innerHeight/1080);STG.style.transform="scale("+k+")";STG.style.left=(innerWidth-1920*k)/2+"px";STG.style.top=(innerHeight-1080*k)/2+"px"}
+addEventListener("resize",fit);fit();
 const showQ=P.get("q")!=="0";
 const rd=()=>{try{return JSON.parse(localStorage.getItem("hmstr_fm_v1"))||{}}catch(e){return{}}};
 const rc=()=>{try{return JSON.parse(localStorage.getItem("hmstr_cfg"))||{}}catch(e){return{}}};
@@ -82,7 +114,7 @@ let last={id:null,rating:null,nk:null,q:"",th:null},hideT=null,ready=false;
 let CF={};
 const snd=n=>{try{if(ready&&CF.snd==="overlay"&&window.SFX)SFX[n]()}catch(e){}};
 function confetti(){const cs=["#ff8a3d","#ffd23f","#fff","#ff2bd6","#00e5ff","#3ddc84"];
-  for(let i=0;i<46;i++){const d=document.createElement("i");d.className="conf";d.style.left=Math.random()*100+"%";d.style.background=cs[i%cs.length];d.style.animationDuration=(2.4+Math.random()*2)+"s";d.style.animationDelay=Math.random()*.6+"s";document.body.appendChild(d);setTimeout(()=>d.remove(),5500)}}
+  for(let i=0;i<46;i++){const d=document.createElement("i");d.className="conf";d.style.left=Math.random()*100+"%";d.style.background=cs[i%cs.length];d.style.animationDuration=(2.4+Math.random()*2)+"s";d.style.animationDelay=Math.random()*.6+"s";STG.appendChild(d);setTimeout(()=>d.remove(),5500)}}
 function upd(){
   const S=remote?{current:remote.current,queue:remote.queue}:rd(),c=S.current,cf=remote?{blind:remote.blind,snd:remote.snd}:rc();CF=cf;
   if(remote&&typeof remote.sndVol==="number")window.SFX_VOL=remote.sndVol;
@@ -95,7 +127,14 @@ function upd(){
     else{card.classList.remove("in");card.classList.add("out")}
   }
   const y=c&&ytId(c.text),th=c?(y?`https://i.ytimg.com/vi/${y}/mqdefault.jpg`:(/^https:/.test(c.thumb||"")?c.thumb:"")):"";
-  if(c&&(id!==last.id||th!==last.th)){const w=$("cv");w.textContent="";if(th){const im=new Image();im.alt="";im.src=th;w.appendChild(im)}else{const d=document.createElement("div");d.className="ph";d.textContent="🎵";w.appendChild(d)}}
+  if(c&&(id!==last.id||th!==last.th)){
+    const w=CLIP?$("cimg"):$("cv");w.textContent="";
+    if(th){
+      if(CLIP){const b=new Image();b.className="bg";b.alt="";b.src=th;w.appendChild(b)}
+      const im=new Image();im.alt="";im.src=th;if(CLIP)im.className="fg";w.appendChild(im)}
+    else{const d=document.createElement("div");d.className="ph";d.textContent="🎵";w.appendChild(d)}
+  }
+  clipSync(c);
   const nk=name+"|"+hide;
   if(c&&nk!==last.nk){$("ttl").textContent=name;$("by").textContent="предложил "+(hide?"???":"@"+c.nick)}
   if(r&&r!==last.rating){const e=$("rt");e.textContent=r;e.style.background=col(r);e.style.setProperty("--rc",col(r));e.className="rating";void e.offsetWidth;e.className="rating show"+(r>=9?" hot":"");
@@ -109,6 +148,38 @@ function upd(){
     else el.classList.remove("show");
   }
   last={id,rating:r||null,nk,q:qs,th};ready=true;
+}
+/* клип: беззвучный YouTube, синхронизированный с панелью (позиция и пауза приходят по WebRTC) */
+let yp=null,ypReady=false,ypId=null,want=null;
+if(CLIP){window.onYouTubeIframeAPIReady=()=>{upd()};const sc=document.createElement("script");sc.src="https://www.youtube.com/iframe_api";document.head.appendChild(sc)}
+function ytMake(id,pos){
+  if(yp||!window.YT||!YT.Player)return;
+  ypId=id;
+  yp=new YT.Player("yt",{videoId:id,width:"100%",height:"100%",playerVars:{autoplay:1,mute:1,controls:0,disablekb:1,fs:0,rel:0,playsinline:1,modestbranding:1,iv_load_policy:3,start:Math.floor(pos||0)},events:{
+    onReady:()=>{ypReady=true;try{yp.mute()}catch(e){}applyWant()},
+    onStateChange:e=>{if(e.data===1)$("cvid").classList.add("on")}}});
+}
+function ypStop(){$("cvid").classList.remove("on");ypId=null;try{if(ypReady)yp.pauseVideo()}catch(e){}}
+function applyWant(){
+  if(!yp||!ypReady||!want)return;
+  try{
+    const w=want;yp.mute();
+    if(ypId!==w.id){ypId=w.id;$("cvid").classList.remove("on");const o={videoId:w.id,startSeconds:w.pos||0};w.play?yp.loadVideoById(o):yp.cueVideoById(o);return}
+    const st=yp.getPlayerState();
+    if(w.play&&st!==1&&st!==3)yp.playVideo();
+    if(!w.play&&st===1)yp.pauseVideo();
+    if(w.pos!=null){const exp=w.pos+(w.play?Math.max(0,Math.min(2,(Date.now()-w.t)/1000)):0);if(Math.abs(yp.getCurrentTime()-exp)>2.5)yp.seekTo(exp,true)}
+  }catch(e){}
+}
+function clipSync(c){
+  if(!CLIP)return;
+  const box=$("clip");
+  if(!c){box.classList.remove("show");want=null;ypStop();return}
+  box.classList.add("show");
+  const y=ytId(c.text);
+  if(!y){want=null;ypStop();return}
+  want={id:y,pos:remote&&typeof remote.pos==="number"?remote.pos:null,play:remote?remote.play!==false:true,t:remote?remote.t||Date.now():Date.now()};
+  if(!yp)ytMake(y,want.pos);else applyWant();
 }
 /* связь с панелью через WebRTC (PeerJS): ?room=КОД */
 const ROOM=P.get("room");let remote=null,rPeer=null,rConn=null,rT=null;
