@@ -20,15 +20,15 @@ html,body{margin:0;height:100%;overflow:hidden;background:transparent;color:#fff
 body.green{background:#00ff00}
 /* сцена фиксированного размера 1920×1080, масштабируется пропорционально (без искажений) */
 #st{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden}
-.logo{position:absolute;left:56px;top:40px;font-weight:900;font-size:34px;letter-spacing:1px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.logo{position:absolute;left:50%;transform:translateX(-50%);top:22px;font-weight:900;font-size:30px;letter-spacing:1px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .logo b{background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.wrap{position:absolute;left:56px;bottom:56px}
-.card{position:relative;display:flex;align-items:center;padding:16px 30px 16px 16px;min-width:520px;max-width:780px;background:var(--card);border:2px solid color-mix(in srgb,var(--ac) 65%,transparent);border-radius:28px;box-shadow:0 0 44px -8px var(--ac),0 14px 40px rgba(0,0,0,.45);backdrop-filter:blur(10px);opacity:0;transform:translateX(-130%)}
+.wrap{position:absolute;right:32px;bottom:22px}
+.card{position:relative;display:flex;align-items:center;padding:16px 30px 16px 16px;min-width:520px;max-width:780px;background:var(--card);border:2px solid color-mix(in srgb,var(--ac) 65%,transparent);border-radius:28px;box-shadow:0 0 44px -8px var(--ac),0 14px 40px rgba(0,0,0,.45);backdrop-filter:blur(10px);opacity:0;transform:translateX(130%)}
 .card.in{animation:sin .9s cubic-bezier(.2,1.25,.4,1) forwards}
 .card.out{animation:sout .55s ease-in forwards}
 .card.in::before{content:"";position:absolute;inset:-2px;border-radius:28px;border:2px solid var(--ac2);opacity:0;animation:flash 1.2s .5s ease-out}
-@keyframes sin{from{transform:translateX(-125%) rotate(-3deg);opacity:0}to{transform:none;opacity:1}}
-@keyframes sout{from{transform:none;opacity:1}to{transform:translateX(-125%);opacity:0}}
+@keyframes sin{from{transform:translateX(125%) rotate(3deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes sout{from{transform:none;opacity:1}to{transform:translateX(125%);opacity:0}}
 @keyframes flash{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(1.06)}}
 .cover{position:relative;width:150px;height:150px;flex:none}
 #cv{width:100%;height:100%}
@@ -39,7 +39,12 @@ body.green{background:#00ff00}
 .txt{margin-left:62px;min-width:0;flex:1}
 /* когда справа показано окно с клипом/обложкой, обложка в карточке не нужна */
 .card.nc .cover{display:none}
-.card.nc .txt{margin-left:14px}
+.card.nc{width:400px;min-width:0;max-width:400px;padding:10px 20px;border-radius:22px}
+.card.nc .txt{margin-left:0}
+.card.nc .kick{font-size:12px;letter-spacing:2.5px}
+.card.nc .title{font-size:26px;margin:3px 0 2px;-webkit-line-clamp:1}
+.card.nc .by{font-size:16px}
+.card.nc .rating{width:84px;height:84px;font-size:42px;top:-52px;right:-6px}
 .kick{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:800;letter-spacing:3px;color:var(--ac2);text-transform:uppercase}
 .eq{display:flex;gap:3px;align-items:flex-end;height:18px}.eq i{width:4px;background:linear-gradient(var(--ac2),var(--ac));border-radius:2px;animation:eq .9s ease-in-out infinite alternate}
 .eq i:nth-child(2){animation-delay:-.3s}.eq i:nth-child(3){animation-delay:-.6s}.eq i:nth-child(4){animation-delay:-.15s}
@@ -54,12 +59,13 @@ body.green{background:#00ff00}
 @keyframes ring{from{transform:scale(1);opacity:1}to{transform:scale(2.6);opacity:0}}
 .rating.hot{animation:stamp .65s cubic-bezier(.2,1.8,.4,1) forwards,pulse 1.2s .7s ease-in-out infinite alternate}
 @keyframes pulse{to{transform:scale(1.12) rotate(8deg)}}
-.queue{position:absolute;right:56px;top:40px;width:420px;background:var(--card);border:2px solid color-mix(in srgb,var(--ac) 40%,transparent);border-radius:22px;padding:14px 20px;backdrop-filter:blur(10px);opacity:0;transform:translateX(30px);transition:.5s}
+.queue{position:absolute;right:20px;top:17px;width:361px;background:var(--card);border:2px solid color-mix(in srgb,var(--ac) 40%,transparent);border-radius:22px;padding:14px 20px;backdrop-filter:blur(10px);opacity:0;transform:translateX(30px);transition:.5s}
 .queue.show{opacity:1;transform:none}
 .queue h4{margin:0 0 8px;font-size:13px;letter-spacing:2.5px;color:var(--ac2);text-transform:uppercase}
 .q{font-size:20px;padding:5px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:qin .5s backwards}
 .q span{color:var(--ac);font-weight:800;margin-right:8px}
 @keyframes qin{from{opacity:0;transform:translateX(20px)}}
+.xchat{position:absolute;left:0;top:0;width:520px;height:640px;border:0;background:transparent;pointer-events:none;display:none}
 /* чат Twitch: без фона, слева под логотипом (лицо стримера по центру остаётся свободным) */
 .chat{position:absolute;left:56px;top:110px;width:430px;max-height:540px;display:flex;flex-direction:column;justify-content:flex-start;gap:4px;overflow:hidden;pointer-events:none}
 .cm{padding:1px 0;font-size:24px;font-weight:600;line-height:1.25;word-break:break-word;text-shadow:0 0 2px #000,0 0 5px #000,0 2px 8px rgba(0,0,0,.9);animation:cin .35s backwards;transition:opacity .6s}
@@ -67,14 +73,13 @@ body.green{background:#00ff00}
 .cm.old{opacity:0}
 @keyframes cin{from{opacity:0;transform:translateX(-20px)}}
 /* окно клипа / обложки */
-.clip{position:absolute;display:none;width:var(--cw,560px);aspect-ratio:16/9;border-radius:26px;border:3px solid color-mix(in srgb,var(--ac) 70%,transparent);background:#000;box-shadow:0 0 44px -8px var(--ac),0 14px 40px rgba(0,0,0,.5);overflow:hidden;opacity:0;transform:translateY(40px) scale(.96);transition:opacity .6s,transform .7s cubic-bezier(.2,1.2,.4,1);pointer-events:none}
+.clip{position:absolute;display:none;width:var(--cw,604px);aspect-ratio:16/9;border-radius:26px;border:3px solid color-mix(in srgb,var(--ac) 70%,transparent);background:#000;box-shadow:0 0 44px -8px var(--ac),0 14px 40px rgba(0,0,0,.5);overflow:hidden;opacity:0;transform:translateY(40px) scale(.96);transition:opacity .6s,transform .7s cubic-bezier(.2,1.2,.4,1);pointer-events:none}
 #st.hasclip .clip{display:block}
 .clip.show{opacity:1;transform:none}
-[data-cp=br] .clip{right:56px;bottom:56px}
-[data-cp=bl] .clip{left:56px;bottom:270px}
-[data-cp=tr] .clip{right:56px;top:250px}
-[data-cp=tl] .clip{left:56px;top:120px}
-[data-cp=c] .clip{left:50%;top:50%;margin-left:calc(var(--cw,560px) / -2);margin-top:calc(var(--cw,560px) * -9 / 32)}
+[data-cp=bl] .clip{left:38px;bottom:48px}
+[data-cp=br] .clip{right:32px;bottom:130px}
+[data-cp=tr] .clip{right:20px;top:330px}
+[data-cp=c] .clip{left:50%;top:50%;margin-left:calc(var(--cw,604px) / -2);margin-top:calc(var(--cw,604px) * -9 / 32)}
 [data-cp=c] .clip.show{transform:none}
 .cimg{position:absolute;inset:0}
 .cimg img{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -92,6 +97,7 @@ body.green{background:#00ff00}
 <div id="st">
 <div class="logo" id="logo">HMSTR<b>.FM</b></div>
 <div class="chat" id="chat"></div>
+<iframe class="xchat" id="xchat" title="chat" allowtransparency="true"></iframe>
 <div class="clip" id="clip"><div class="cimg" id="cimg"></div><div class="cvid" id="cvid"><div id="yt"></div></div></div>
 <div class="wrap"><div class="card" id="card">
   <div class="cover"><div class="disc"></div><div id="cv"></div></div>
@@ -106,14 +112,19 @@ body.green{background:#00ff00}
 const P=new URLSearchParams(location.search),$=id=>document.getElementById(id);
 if(P.get("bg")==="green")document.body.classList.add("green");
 if(P.get("logo")==="0")$("logo").style.display="none";
-/* параметры клипа: ?clip=0 — выключить; ?cp=br|bl|tr|tl|c — положение; ?cw=800 — ширина окна в пикселях сцены 1920×1080 */
+/* параметры клипа: ?clip=0 — выключить; ?cp=bl|br|tr|c — положение; ?cw=800 — ширина окна в пикселях сцены 1920×1080 */
 const CLIP=P.get("clip")!=="0",STG=$("st");
-STG.dataset.cp=["br","bl","tr","tl","c"].includes(P.get("cp"))?P.get("cp"):"br";
+STG.dataset.cp=["bl","br","tr","c"].includes(P.get("cp"))?P.get("cp"):"bl";
 if(CLIP){STG.classList.add("hasclip");$("card").classList.add("nc");const w=parseInt(P.get("cw"),10);if(w)STG.style.setProperty("--cw",Math.max(320,Math.min(1400,w))+"px")}
 function fit(){const k=Math.min(innerWidth/1920,innerHeight/1080);STG.style.transform="scale("+k+")";STG.style.left=(innerWidth-1920*k)/2+"px";STG.style.top=(innerHeight-1080*k)/2+"px"}
 addEventListener("resize",fit);fit();
 /* чат: ?chat=0 — скрыть; ?chatt=30 — сколько секунд живёт сообщение */
-const CHAT=P.get("chat")!=="0",CHT=Math.max(5,parseInt(P.get("chatt"),10)||30);
+const CHAT_URL="https://chat.eblo.id/chat/overlay/?channel=h_mst_r&font=2&shadow=1&nick_name=display&nick_cut=off&smooth=10&fade=20&max_lines=10&paint_shadows=false&plus_paint_shadows=false&chatterino_badges=true&ffz_badges=true&homies_badges=true&effects=false&link_urls=hide&gif_size=small&events=announcement%2Csub%2Cgift%2Craid%2Ccheer&collapse_spam=true&sv=3";
+/* ?chat=0 — без чата; ?chat=own — встроенный простой чат (через панель); иначе — внешний чат chat.eblo.id в рамке.
+   ?chan=имя — другой канал; ?chaturl=… — свой адрес чата целиком */
+const CM=P.get("chat"),XCHAT=CM!=="0"&&CM!=="own";
+if(XCHAT){try{const u=new URL(P.get("chaturl")||CHAT_URL);if(P.get("chan"))u.searchParams.set("channel",P.get("chan"));const f=$("xchat");f.src=u.href;f.style.display="block"}catch(e){}}
+const CHAT=CM==="own",CHT=Math.max(5,parseInt(P.get("chatt"),10)||30);
 if(!CHAT)$("chat").style.display="none";
 function addChat(d){
   if(!CHAT||!d||!d.text)return;
