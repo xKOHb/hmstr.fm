@@ -299,6 +299,8 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
   <div class="fld"><label for="c-cd">Пауза между заявками, сек</label><input type="number" id="c-cd" min="0" max="600"></div>
   <div class="fld"><label for="c-maxmin">Лимит длины трека, мин<small>0 — без лимита; проверяется для YouTube, у остальных длина неизвестна</small></label><input type="number" id="c-maxmin" min="0" max="120"></div>
   <div class="fld"><label for="c-lenskip">Пропускать треки длиннее лимита<small>выключено — только предупреждение</small></label><input type="checkbox" id="c-lenskip"></div>
+  <div class="fld"><label for="c-ytkey">YouTube API-ключ<small>для автозамены видео без встраивания; хранится только в этом браузере, в экспорт не попадает</small></label><input type="password" id="c-ytkey" autocomplete="off" placeholder="AIza…"></div>
+  <div class="fld"><label for="c-autoalt">Автозамена видео без встраивания<small>ищет версию с текстом (lyrics) и подменяет ссылку, нужен ключ</small></label><input type="checkbox" id="c-autoalt"></div>
   <div class="hint"><span class="dot" id="tw-dot"></span><span id="tw-st">выключено</span> · читает чат анонимно, отвечать не умеет. Пример: <b>!заказ Artist - Song</b></div>
   <div class="hint" id="tw-last"></div>
   <h3>Фильтры</h3>
@@ -361,9 +363,45 @@ window.onYouTubeIframeAPIReady=()=>{ytReady=true;if(pending){mountYT(pending);pe
 function mountYT(id){
   player=new YT.Player("yt",{videoId:id,width:"100%",height:"100%",playerVars:{autoplay:1,rel:0,playsinline:1,modestbranding:1},events:{
     onReady:e=>{applyVol();e.target.playVideo();grab()},
-    onError:e=>{toast("YouTube не играет это видео (код "+e.data+")");
-      if(e.data===101||e.data===150){const st=$("stage");st.classList.add("auto");st.innerHTML='<div class="idle"><div class="vinyl"></div><div>Автор запретил встраивать это видео.<br>Нажми <b>O</b> — трек откроется на YouTube</div></div>';player=null;playing=false;$("pp").disabled=true;setLive()}},
+    onError:e=>{toast("YouTube не играет это видео (код "+e.data+")");if(e.data===101||e.data===150)embedFail()},
     onStateChange:e=>{playing=e.data===1;$("pp").textContent=playing?"⏸":"▶";grab();setLive();bcast()}}});
+}
+/* видео без встраивания (101/150): автозамена на другую версию через YouTube Data API (нужен ключ в настройках) */
+const noEmbedMsg='Автор запретил встраивать это видео.<br>Нажми <b>O</b> — трек откроется на YouTube';
+function stageMsg(h){const st=$("stage");st.classList.add("auto");st.innerHTML='<div class="idle"><div class="vinyl"></div><div>'+h+'</div></div>';player=null;playing=false;$("pp").disabled=true;setLive()}
+const decHtml=s=>{const t=document.createElement("textarea");t.innerHTML=s;return t.value};
+async function ytApi(path,params){
+  const u=new URL("https://www.googleapis.com/youtube/v3/"+path);
+  Object.entries({...params,key:(cfg.ytKey||"").trim()}).forEach(([k,v])=>u.searchParams.set(k,v));
+  const r=await fetch(u),j=await r.json().catch(()=>({}));
+  if(!r.ok){const e=new Error((j.error&&j.error.message)||r.status);e.reason=j.error&&j.error.errors&&j.error.errors[0]&&j.error.errors[0].reason;throw e}
+  return j;
+}
+async function findAlt(c){
+  try{
+    const id=ytId(c.text);let title=c.title,author=c.author||"";
+    if(!title){const j=await ytApi("videos",{part:"snippet",id}),sn=j.items&&j.items[0]&&j.items[0].snippet;if(sn){title=sn.title;author=sn.channelTitle||""}}
+    if(!title)return null;
+    const base=cleanTitle(plName({text:c.text,title,author})||title);if(!base)return null;
+    const j=await ytApi("search",{part:"snippet",type:"video",videoEmbeddable:"true",videoSyndicated:"true",maxResults:"8",q:base.replace(/\s[–—]\s/," - ")+" lyrics"});
+    const bad=/\b(cover|remix|sped\s*up|slowed|reverb|nightcore|8d|karaoke|instrumental|live|reaction)\b/i;
+    const items=(j.items||[]).filter(x=>x.id&&x.id.videoId&&x.id.videoId!==id);
+    const pick=items.find(x=>!(bad.test(x.snippet.title)&&!bad.test(title)))||items[0];
+    return pick?{id:pick.id.videoId,title:pick.snippet.title,title0:title,author0:author}:null;
+  }catch(e){toast(e.reason==="quotaExceeded"?"Лимит YouTube API на сегодня исчерпан":"Автозамена: ошибка API ("+(e.reason||e.message)+")");return null}
+}
+function applyAlt(c,r){
+  const cur=S.current;if(!cur||cur.id!==c.id)return;
+  cur.orig=cur.text;cur.text="https://www.youtube.com/watch?v="+r.id;
+  if(!cur.title&&r.title0){cur.title=r.title0;cur.author=cur.author||r.author0}
+  cur.name=plName(cur);save();show();toast("🔁 Заменил на: "+decHtml(r.title));
+}
+function embedFail(){
+  const c=S.current;
+  if(c&&!c.orig&&cfg.autoAlt&&(cfg.ytKey||"").trim()){
+    stageMsg("Автор запретил встраивать это видео.<br>Ищу другую версию (lyrics)…");
+    findAlt(c).then(r=>{if(!S.current||S.current.id!==c.id)return;if(r)applyAlt(c,r);else stageMsg(noEmbedMsg)});
+  }else stageMsg(noEmbedMsg);
 }
 function grab(){try{const d=player.getVideoData(),c=S.current;if(!d||!c||!d.title)return;if(!c.title||(!c.author&&d.author)){c.title=c.title||d.title;c.author=c.author||d.author||"";c.name=plName(c);save();renderNow(false);renderLists()}}catch(e){}}
 function applyVol(){
@@ -451,7 +489,7 @@ $("exp").onclick=async()=>{const all=[S.current,...S.history].filter(x=>x&&x.pl)
 $("clr").onclick=()=>{if(confirm("Очистить очередь и историю?")){S=fixS();save();show()}};
 
 const CFGK="hmstr_cfg";
-let cfg={chan:"",bot:false,cmds:"!заказ,!sr,!order",maxq:2,cd:30,clean:true,copy:"names",fxBg:true,fxBurst:true,ovq:true,snd:"panel",blind:false,banNicks:"",banWords:"",conf:true,sndVol:25,room:"",maxMin:8,lenSkip:true};
+let cfg={chan:"",bot:false,cmds:"!заказ,!sr,!order",maxq:2,cd:30,clean:true,copy:"names",fxBg:true,fxBurst:true,ovq:true,snd:"panel",blind:false,banNicks:"",banWords:"",conf:true,sndVol:25,room:"",maxMin:8,lenSkip:true,autoAlt:true,ytKey:""};
 try{Object.assign(cfg,JSON.parse(ls.get(CFGK)||"{}"))}catch(e){}
 const cfgSave=()=>ls.set(CFGK,JSON.stringify(cfg));
 function chanName(v){v=String(v||"").trim().toLowerCase();const m=v.match(/twitch\.tv\/(?:popout\/)?([a-z0-9_]+)/);if(m)v=m[1];return v.replace(/^[#@]/,"").replace(/[^a-z0-9_]/g,"")}
@@ -514,7 +552,7 @@ function onChat(tags,login,msg){
 /* settings UI */
 $("tgrid").innerHTML=THEMES.map(([k,n,g])=>`<button class="tc" data-t="${k}"><div class="pv" style="background:${g}"></div><span>${n}</span></button>`).join("");
 $("tgrid").onclick=e=>{const b=e.target.closest(".tc");if(b)setTheme(b.dataset.t)};
-[["c-chan","chan","s"],["c-bot","bot","b"],["c-cmds","cmds","s"],["c-maxq","maxq","n"],["c-cd","cd","n"],["c-maxmin","maxMin","n"],["c-lenskip","lenSkip","b"],["c-clean","clean","b"],["c-copy","copy","s"],["c-fxbg","fxBg","b"],["c-fxb","fxBurst","b"],["c-ovq","ovq","b"],["c-sndv","sndVol","n"],["c-snd","snd","s"],["c-blind","blind","b"],["c-bann","banNicks","s"],["c-banw","banWords","s"],["c-conf","conf","b"]].forEach(([id,k,ty])=>{
+[["c-chan","chan","s"],["c-bot","bot","b"],["c-cmds","cmds","s"],["c-maxq","maxq","n"],["c-cd","cd","n"],["c-maxmin","maxMin","n"],["c-lenskip","lenSkip","b"],["c-ytkey","ytKey","s"],["c-autoalt","autoAlt","b"],["c-clean","clean","b"],["c-copy","copy","s"],["c-fxbg","fxBg","b"],["c-fxb","fxBurst","b"],["c-ovq","ovq","b"],["c-sndv","sndVol","n"],["c-snd","snd","s"],["c-blind","blind","b"],["c-bann","banNicks","s"],["c-banw","banWords","s"],["c-conf","conf","b"]].forEach(([id,k,ty])=>{
   const el=$(id);if(ty==="b")el.checked=!!cfg[k];else el.value=cfg[k];
   el.onchange=()=>{cfg[k]=ty==="b"?el.checked:ty==="n"?+el.value:el.value.trim();if(k==="chan"){cfg.chan=chanName(el.value);el.value=cfg.chan}cfgSave();applyCfg();bcast();
     if(k==="chan"||k==="bot")twConnect();if(k==="blind"){renderNow(false);renderLists()}
@@ -526,7 +564,7 @@ $("modal").onclick=e=>{if(e.target===$("modal"))$("modal").classList.remove("ope
 const ovLink=()=>location.origin+"/overlay.html?room="+cfg.room+(cfg.ovq?"":"&q=0");
 $("ov-copy").onclick=async()=>{try{await navigator.clipboard.writeText(ovLink());toast("Ссылка скопирована ✓")}catch(e){toast(ovLink())}};
 $("ov-win").onclick=()=>window.open("/overlay.html?bg=green&room="+cfg.room+(cfg.ovq?"":"&q=0"),"hmstr_overlay","width=980,height=420");
-$("d-exp").onclick=()=>{const b=new Blob([JSON.stringify({S,cfg},null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="hmstr-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$("d-exp").onclick=()=>{const b=new Blob([JSON.stringify({S,cfg:(({ytKey,...r})=>r)(cfg)},null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="hmstr-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 $("d-imp").onclick=()=>$("d-file").click();
 $("d-file").onchange=async e=>{try{const j=JSON.parse(await e.target.files[0].text());if(j.S){S=fixS(j.S);save()}if(j.cfg){Object.assign(cfg,j.cfg);cfgSave();location.reload();return}show();toast("Импортировано ✓")}catch(x){toast("Не удалось прочитать файл")}};
 /* oEmbed: название и обложка для Spotify / SoundCloud */
