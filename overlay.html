@@ -63,42 +63,45 @@ body.green{background:#00ff00}
   <div class="rating" id="rt"></div>
 </div></div>
 <div class="queue" id="q"><h4>Далее в эфире</h4><div id="ql"></div></div>
+<script src="sfx.js"></script>
 <script>
 const P=new URLSearchParams(location.search),$=id=>document.getElementById(id);
 if(P.get("bg")==="green")document.body.classList.add("green");
 if(P.get("logo")==="0")$("logo").style.display="none";
 const showQ=P.get("q")!=="0";
 const rd=()=>{try{return JSON.parse(localStorage.getItem("hmstr_fm_v1"))||{}}catch(e){return{}}};
+const rc=()=>{try{return JSON.parse(localStorage.getItem("hmstr_cfg"))||{}}catch(e){return{}}};
 const ytId=u=>((u||"").match(/(?:youtu\.be\/|[?&]v=|embed\/|shorts\/)([\w-]{11})/)||[])[1];
 const col=n=>`hsl(${(n-1)*13} 85% 58%)`;
-let last={id:null,rating:null,name:null,q:""},hideT=null;
+let last={id:null,rating:null,nk:null,q:"",th:null},hideT=null,ready=false;
+const snd=n=>{try{if(ready&&rc().snd==="overlay"&&window.SFX)SFX[n]()}catch(e){}};
 function confetti(){const cs=["#ff8a3d","#ffd23f","#fff","#ff2bd6","#00e5ff","#3ddc84"];
   for(let i=0;i<46;i++){const d=document.createElement("i");d.className="conf";d.style.left=Math.random()*100+"%";d.style.background=cs[i%cs.length];d.style.animationDuration=(2.4+Math.random()*2)+"s";d.style.animationDelay=Math.random()*.6+"s";document.body.appendChild(d);setTimeout(()=>d.remove(),5500)}}
 function upd(){
-  const S=rd(),c=S.current;
+  const S=rd(),c=S.current,cf=rc();
   document.documentElement.dataset.theme=localStorage.getItem("hmstr_theme")||"hamster";
-  const card=$("card"),id=c?c.id:null,name=c?(c.name||c.title||c.text):null;
+  const card=$("card"),id=c?c.id:null,r=c&&c.rating,hide=!!(cf.blind&&c&&!r);
+  let name=c?(c.name||c.title||c.text||""):"";if(/^https?:/i.test(name)){try{name=new URL(name).hostname.replace(/^www\./,"")+" · трек по ссылке"}catch(e){}}
   if(id!==last.id){
     clearTimeout(hideT);
-    if(c){
-      const y=ytId(c.text);
-      $("cv").innerHTML=y?`<img alt="" src="https://i.ytimg.com/vi/${y}/mqdefault.jpg">`:'<div class="ph">🎵</div>';
-      card.classList.remove("out","in");void card.offsetWidth;card.classList.add("in");
-      $("rt").className="rating";
-    }else{card.classList.remove("in");card.classList.add("out")}
+    if(c){card.classList.remove("out","in");void card.offsetWidth;card.classList.add("in");$("rt").className="rating";snd("jingle")}
+    else{card.classList.remove("in");card.classList.add("out")}
   }
-  if(c&&name!==last.name){$("ttl").textContent=name;$("by").textContent="предложил @"+c.nick}
-  const r=c&&c.rating;
-  if(r&&r!==last.rating){const e=$("rt");e.textContent=r;e.style.background=col(r);e.style.setProperty("--rc",col(r));e.className="rating";void e.offsetWidth;e.className="rating show"+(r>=9?" hot":"");if(r===10)confetti()}
+  const y=c&&ytId(c.text),th=c?(y?`https://i.ytimg.com/vi/${y}/mqdefault.jpg`:(/^https:/.test(c.thumb||"")?c.thumb:"")):"";
+  if(c&&(id!==last.id||th!==last.th)){const w=$("cv");w.textContent="";if(th){const im=new Image();im.alt="";im.src=th;w.appendChild(im)}else{const d=document.createElement("div");d.className="ph";d.textContent="🎵";w.appendChild(d)}}
+  const nk=name+"|"+hide;
+  if(c&&nk!==last.nk){$("ttl").textContent=name;$("by").textContent="предложил "+(hide?"???":"@"+c.nick)}
+  if(r&&r!==last.rating){const e=$("rt");e.textContent=r;e.style.background=col(r);e.style.setProperty("--rc",col(r));e.className="rating";void e.offsetWidth;e.className="rating show"+(r>=9?" hot":"");
+    if(r===10){confetti();snd("horn");snd("applause")}else if(r===9)snd("applause")}
   if(!r)$("rt").className="rating";
-  const q=showQ?S.queue||[]:[],qs=JSON.stringify(q.slice(0,3).map(x=>x.id));
+  const q=showQ?S.queue||[]:[],qs=JSON.stringify(q.slice(0,3).map(x=>x.id))+(cf.blind?"b":"");
   if(qs!==last.q){
-    const el=$("q");
-    if(q.length){$("ql").innerHTML=q.slice(0,3).map((x,i)=>`<div class="q" style="animation-delay:${i*.12}s"><span>${i+1}</span></div>`).join("");
-      [...$("ql").children].forEach((d,i)=>d.appendChild(document.createTextNode(/^https?:/i.test(q[i].text)?"ссылка от @"+q[i].nick:q[i].text)));el.classList.add("show")}
+    const el=$("q"),l=$("ql");l.textContent="";
+    if(q.length){q.slice(0,3).forEach((x,i)=>{const d=document.createElement("div");d.className="q";d.style.animationDelay=i*.12+"s";const sp=document.createElement("span");sp.textContent=i+1;d.appendChild(sp);
+      d.appendChild(document.createTextNode(/^https?:/i.test(x.text)?"ссылка от "+(cf.blind?"???":"@"+x.nick):x.text));l.appendChild(d)});el.classList.add("show")}
     else el.classList.remove("show");
   }
-  last={id,rating:r||null,name,q:qs};
+  last={id,rating:r||null,nk,q:qs,th};ready=true;
 }
 addEventListener("storage",upd);
 setInterval(upd,1000);upd();
