@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="hamster">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HMSTR.FM — оверлей</title>
+<style>
+:root{--ac:#ff8a3d;--ac2:#ffc46b;--card:rgba(24,17,12,.86)}
+[data-theme=neon]{--ac:#ff2bd6;--ac2:#00e5ff;--card:rgba(26,9,56,.88)}
+[data-theme=space]{--ac:#7c9cff;--ac2:#c39bff;--card:rgba(10,16,42,.88)}
+[data-theme=lagoon]{--ac:#2fe3b0;--ac2:#6ad6ff;--card:rgba(6,44,42,.88)}
+[data-theme=sakura]{--ac:#ff7eb6;--ac2:#ffc2dd;--card:rgba(44,19,34,.88)}
+[data-theme=matrix]{--ac:#00ff7f;--ac2:#b6ff5e;--card:rgba(2,20,10,.9)}
+[data-theme=retro]{--ac:#ffb02e;--ac2:#ff6b3d;--card:rgba(50,29,10,.88)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:transparent;color:#fff;font-family:system-ui,"Segoe UI",Roboto,sans-serif}
+body.green{background:#00ff00}
+.logo{position:absolute;left:3vw;top:4vh;font-weight:900;font-size:30px;letter-spacing:1px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.logo b{background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.wrap{position:absolute;left:3vw;bottom:5vh}
+.card{position:relative;display:flex;align-items:center;padding:16px 30px 16px 16px;min-width:560px;max-width:920px;background:var(--card);border:2px solid color-mix(in srgb,var(--ac) 65%,transparent);border-radius:28px;box-shadow:0 0 44px -8px var(--ac),0 14px 40px rgba(0,0,0,.45);backdrop-filter:blur(10px);opacity:0;transform:translateX(-130%)}
+.card.in{animation:sin .9s cubic-bezier(.2,1.25,.4,1) forwards}
+.card.out{animation:sout .55s ease-in forwards}
+.card.in::before{content:"";position:absolute;inset:-2px;border-radius:28px;border:2px solid var(--ac2);opacity:0;animation:flash 1.2s .5s ease-out}
+@keyframes sin{from{transform:translateX(-125%) rotate(-3deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes sout{from{transform:none;opacity:1}to{transform:translateX(-125%);opacity:0}}
+@keyframes flash{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(1.06)}}
+.cover{position:relative;width:150px;height:150px;flex:none}
+.cover img,.cover .ph{position:relative;z-index:2;width:100%;height:100%;object-fit:cover;border-radius:20px;display:block;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.ph{background:linear-gradient(135deg,var(--ac),var(--ac2));display:grid;place-items:center;font-size:60px}
+.disc{position:absolute;z-index:1;right:-48px;top:12px;width:126px;height:126px;border-radius:50%;background:radial-gradient(circle,var(--ac) 0 14%,#111 15% 17%,transparent 18%),repeating-radial-gradient(circle,#0b0b0b 0 3px,#1d1d1d 4px 5px);box-shadow:0 0 22px -4px var(--ac);animation:spin 3.5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.txt{margin-left:62px;min-width:0;flex:1}
+.kick{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:800;letter-spacing:3px;color:var(--ac2);text-transform:uppercase}
+.eq{display:flex;gap:3px;align-items:flex-end;height:18px}.eq i{width:4px;background:linear-gradient(var(--ac2),var(--ac));border-radius:2px;animation:eq .9s ease-in-out infinite alternate}
+.eq i:nth-child(2){animation-delay:-.3s}.eq i:nth-child(3){animation-delay:-.6s}.eq i:nth-child(4){animation-delay:-.15s}
+@keyframes eq{from{height:15%}to{height:100%}}
+.title{font-size:36px;font-weight:800;line-height:1.15;margin:6px 0 4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.by{font-size:22px;color:var(--ac2);font-weight:600}
+.rating{position:absolute;top:-34px;right:-26px;width:100px;height:100px;border-radius:50%;display:grid;place-items:center;font-size:50px;font-weight:900;color:#111;transform:scale(0);opacity:0}
+.rating.show{animation:stamp .65s cubic-bezier(.2,1.8,.4,1) forwards}
+.rating::after{content:"";position:absolute;inset:0;border-radius:50%;border:5px solid currentColor;color:inherit;border-color:var(--rc,#fff);opacity:0}
+.rating.show::after{animation:ring .9s ease-out}
+@keyframes stamp{from{transform:scale(3.2) rotate(-25deg);opacity:0}to{transform:scale(1) rotate(8deg);opacity:1}}
+@keyframes ring{from{transform:scale(1);opacity:1}to{transform:scale(2.6);opacity:0}}
+.rating.hot{animation:stamp .65s cubic-bezier(.2,1.8,.4,1) forwards,pulse 1.2s .7s ease-in-out infinite alternate}
+@keyframes pulse{to{transform:scale(1.12) rotate(8deg)}}
+.queue{position:absolute;right:3vw;bottom:5vh;width:380px;background:var(--card);border:2px solid color-mix(in srgb,var(--ac) 40%,transparent);border-radius:22px;padding:14px 20px;backdrop-filter:blur(10px);opacity:0;transform:translateX(30px);transition:.5s}
+.queue.show{opacity:1;transform:none}
+.queue h4{margin:0 0 8px;font-size:13px;letter-spacing:2.5px;color:var(--ac2);text-transform:uppercase}
+.q{font-size:20px;padding:5px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:qin .5s backwards}
+.q span{color:var(--ac);font-weight:800;margin-right:8px}
+@keyframes qin{from{opacity:0;transform:translateX(20px)}}
+.conf{position:fixed;top:-30px;width:11px;height:18px;border-radius:2px;animation:fall linear forwards;z-index:9}
+@keyframes fall{to{transform:translateY(112vh) rotate(720deg)}}
+</style>
+</head>
+<body>
+<div class="logo" id="logo">HMSTR<b>.FM</b></div>
+<div class="wrap"><div class="card" id="card">
+  <div class="cover"><div class="disc"></div><div id="cv"></div></div>
+  <div class="txt"><div class="kick"><span class="eq"><i></i><i></i><i></i><i></i></span>Сейчас играет</div><div class="title" id="ttl"></div><div class="by" id="by"></div></div>
+  <div class="rating" id="rt"></div>
+</div></div>
+<div class="queue" id="q"><h4>Далее в эфире</h4><div id="ql"></div></div>
+<script>
+const P=new URLSearchParams(location.search),$=id=>document.getElementById(id);
+if(P.get("bg")==="green")document.body.classList.add("green");
+if(P.get("logo")==="0")$("logo").style.display="none";
+const showQ=P.get("q")!=="0";
+const rd=()=>{try{return JSON.parse(localStorage.getItem("hmstr_fm_v1"))||{}}catch(e){return{}}};
+const ytId=u=>((u||"").match(/(?:youtu\.be\/|[?&]v=|embed\/|shorts\/)([\w-]{11})/)||[])[1];
+const col=n=>`hsl(${(n-1)*13} 85% 58%)`;
+let last={id:null,rating:null,name:null,q:""},hideT=null;
+function confetti(){const cs=["#ff8a3d","#ffd23f","#fff","#ff2bd6","#00e5ff","#3ddc84"];
+  for(let i=0;i<46;i++){const d=document.createElement("i");d.className="conf";d.style.left=Math.random()*100+"%";d.style.background=cs[i%cs.length];d.style.animationDuration=(2.4+Math.random()*2)+"s";d.style.animationDelay=Math.random()*.6+"s";document.body.appendChild(d);setTimeout(()=>d.remove(),5500)}}
+function upd(){
+  const S=rd(),c=S.current;
+  document.documentElement.dataset.theme=localStorage.getItem("hmstr_theme")||"hamster";
+  const card=$("card"),id=c?c.id:null,name=c?(c.name||c.title||c.text):null;
+  if(id!==last.id){
+    clearTimeout(hideT);
+    if(c){
+      const y=ytId(c.text);
+      $("cv").innerHTML=y?`<img alt="" src="https://i.ytimg.com/vi/${y}/mqdefault.jpg">`:'<div class="ph">🎵</div>';
+      card.classList.remove("out","in");void card.offsetWidth;card.classList.add("in");
+      $("rt").className="rating";
+    }else{card.classList.remove("in");card.classList.add("out")}
+  }
+  if(c&&name!==last.name){$("ttl").textContent=name;$("by").textContent="предложил @"+c.nick}
+  const r=c&&c.rating;
+  if(r&&r!==last.rating){const e=$("rt");e.textContent=r;e.style.background=col(r);e.style.setProperty("--rc",col(r));e.className="rating";void e.offsetWidth;e.className="rating show"+(r>=9?" hot":"");if(r===10)confetti()}
+  if(!r)$("rt").className="rating";
+  const q=showQ?S.queue||[]:[],qs=JSON.stringify(q.slice(0,3).map(x=>x.id));
+  if(qs!==last.q){
+    const el=$("q");
+    if(q.length){$("ql").innerHTML=q.slice(0,3).map((x,i)=>`<div class="q" style="animation-delay:${i*.12}s"><span>${i+1}</span></div>`).join("");
+      [...$("ql").children].forEach((d,i)=>d.appendChild(document.createTextNode(/^https?:/i.test(q[i].text)?"ссылка от @"+q[i].nick:q[i].text)));el.classList.add("show")}
+    else el.classList.remove("show");
+  }
+  last={id,rating:r||null,name,q:qs};
+}
+addEventListener("storage",upd);
+setInterval(upd,1000);upd();
+</script>
+</body>
+</html>
