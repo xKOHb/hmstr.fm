@@ -106,8 +106,8 @@ body.green{background:#00ff00}
 .pb{height:6px;border-radius:9px;background:rgba(255,255,255,.14);margin-top:8px;overflow:hidden}
 .pb i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:9px}
 .pt{display:flex;justify-content:space-between;margin-top:4px;font-size:15px;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums}
-.vote{position:absolute;top:-30px;left:24px;padding:6px 16px;border-radius:99px;background:var(--card);border:2px solid var(--ac2);font-weight:800;font-size:20px;opacity:0;transform:translateY(8px);transition:.4s;white-space:nowrap}
-.vote.show{opacity:1;transform:none}.vote b{color:var(--ac2)}
+.vote{padding:2px 10px;border-radius:99px;border:1.5px solid var(--ac2);font-weight:800;font-size:13px;letter-spacing:0;text-transform:none;color:#fff;opacity:0;transition:.4s;white-space:nowrap}
+.vote.show{opacity:1}.vote b{color:var(--ac2)}
 .flash{position:absolute;inset:0;background:radial-gradient(circle,#fff,var(--ac) 40%,transparent 75%);opacity:0;pointer-events:none;z-index:8}
 .flash.go{animation:fl 1s ease-out}@keyframes fl{0%{opacity:.85}100%{opacity:0}}
 .ham{position:absolute;top:-80px;font-size:56px;font-style:normal;animation:fall linear forwards;z-index:9}
@@ -127,22 +127,24 @@ body.green{background:#00ff00}
 .sn-s{font-size:34px;opacity:.85;margin-bottom:28px;min-height:40px}
 .sn-q{font-size:34px;min-width:640px;text-align:left}.sn-q h4{margin:0 0 10px;font-size:22px;letter-spacing:4px;color:var(--ac2);text-transform:uppercase}
 .sn-q div{padding:4px 0}.sn-q span{color:var(--ac);font-weight:800;margin-right:14px}
+.kick{justify-content:space-between}
+.title{display:block;overflow:visible;-webkit-line-clamp:unset}
+.card.nc .title{display:block;overflow:visible}
 </style>
 </head>
 <body>
-<div id="st"><div class="aura" id="au"><i></i><i></i><i></i></div>
+<div id="st">
 <div class="logo" id="logo">HMSTR<b>.FM</b></div>
 <div class="chat" id="chat"></div>
 <iframe class="xchat" id="xchat" title="chat" allowtransparency="true"></iframe>
 <div class="clip" id="clip"><div class="cimg" id="cimg"></div><div class="cvid" id="cvid"><div id="yt"></div></div></div>
 <div class="wrap"><div class="card" id="card">
   <div class="cover"><div class="disc"></div><div id="cv"></div></div>
-  <div class="txt"><div class="kick">Сейчас играет</div><div class="title" id="ttl"></div><div class="by" id="by"></div><canvas id="vz" width="640" height="84"></canvas><div class="pb"><i id="pbi"></i></div><div class="pt"><span id="pa"></span><span id="pd"></span></div></div>
-  <div class="vote" id="vt"></div><div class="rating" id="rt"></div>
+  <div class="txt"><div class="kick"><span>Сейчас играет</span><span class="vote" id="vt"></span></div><div class="title" id="ttl"></div><div class="by" id="by"></div><div class="pb"><i id="pbi"></i></div><div class="pt"><span id="pa"></span><span id="pd"></span></div></div>
+  <div class="rating" id="rt"></div>
 </div></div>
 <div class="queue" id="q"><h4>Далее в эфире</h4><div id="ql"></div></div>
 <div class="flash" id="fl"></div>
-<div class="tick" id="tk"><div class="tk-in" id="tki"></div></div>
 <div class="scene" id="sn"><div><div class="sn-k" id="snk"></div><div class="sn-t" id="snt"></div><div class="sn-s" id="sns"></div><div class="sn-q" id="snq"></div></div></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -152,8 +154,7 @@ const P=new URLSearchParams(location.search),$=id=>document.getElementById(id);
 if(P.get("bg")==="green")document.body.classList.add("green");
 if(P.get("logo")==="0")$("logo").style.display="none";
 /* параметры клипа: ?clip=0 — выключить; ?cp=bl|br|tr|c — положение; ?cw=800 — ширина окна в пикселях сцены 1920×1080 */
-const CLIP=P.get("clip")!=="0",STG=$("st"),TICK=P.get("tick")!=="0",SCN=P.get("scene")!=="0";
-if(TICK)STG.classList.add("tk");
+const CLIP=P.get("clip")!=="0",STG=$("st"),SCN=P.get("scene")!=="0";
 STG.dataset.cp=["bl","br","tr","c"].includes(P.get("cp"))?P.get("cp"):"bl";
 if(CLIP){STG.classList.add("hasclip");$("card").classList.add("nc");const w=parseInt(P.get("cw"),10);if(w)STG.style.setProperty("--cw",Math.max(320,Math.min(1400,w))+"px")}
 function fit(){const k=Math.min(innerWidth/1920,innerHeight/1080);STG.style.transform="scale("+k+")";STG.style.left=(innerWidth-1920*k)/2+"px";STG.style.top=(innerHeight-1080*k)/2+"px"}
@@ -205,7 +206,7 @@ function upd(){
   }
   clipSync(c);
   const nk=name+"|"+hide;
-  if(c&&nk!==last.nk){$("ttl").textContent=name;$("by").textContent="предложил "+(hide?"???":"@"+c.nick)}
+  if(c&&nk!==last.nk){$("ttl").textContent=name;fitTitle();$("by").textContent="предложил "+(hide?"???":"@"+c.nick)}
   if(r&&r!==last.rating){const e=$("rt");e.textContent=r;e.style.background=col(r);e.style.setProperty("--rc",col(r));e.className="rating";void e.offsetWidth;e.className="rating show"+(r>=9?" hot":"");
     if(ready){if(r===10){confetti();rain();flash();snd("horn");snd("applause")}else if(r===9)snd("applause");else if(r===1){skull();snd("fail")}}}
   if(!r)$("rt").className="rating";
@@ -270,14 +271,8 @@ const seedOf=id=>{let h=0;for(const ch of String(id))h=(h*31+ch.charCodeAt(0))|0
 let PG={dur:0,pos:0,play:false,t:0,t0:0,has:false,seed:1},SC={on:false,kind:"break",end:0},tkK="",scK="";
 function extra(S,c,r,th,name){
   const R=remote,v=R&&R.vote,vt=$("vt");
-  if(c&&v&&(v.n>0||v.open)){vt.innerHTML=v.n?"💬 ЧАТ <b>"+v.avg+"</b> · "+v.n:"💬 оценка чата: <b>!1…!10</b>";vt.classList.add("show")}else vt.classList.remove("show");
+  if(c&&v&&(v.n>0||v.open)){vt.innerHTML=v.n?"💬 ЧАТ <b>"+v.avg+"</b> · "+v.n:"💬 <b>!1…!10</b>";vt.classList.add("show")}else vt.classList.remove("show");
   PG={dur:R&&R.dur>0?R.dur:0,pos:R&&typeof R.pos==="number"?R.pos:0,play:R?R.play!==false:true,t:R?R.t||Date.now():Date.now(),t0:c&&c.t0||(R&&R.t0)||0,has:!!c,seed:c?seedOf(c.id):1};
-  tint(th);
-  let h=R?(R.hist||[]):(S.history||[]).filter(x=>x.rating).slice(0,5).map(x=>({n:x.name||x.title||x.text,r:x.rating}));
-  if(c&&r)h=[{n:name,r},...h];
-  const tk=JSON.stringify(h);
-  if(TICK&&tk!==tkK){tkK=tk;const k=$("tk");
-    if(h.length){const half=h.map(x=>"<span>"+esc(String(x.n).slice(0,34))+': <b style="background:'+col(x.r)+'">'+x.r+"</b></span>").join(""),lb='<span class="lb">★ ОЦЕНКИ ВЕЧЕРА</span>';$("tki").innerHTML=lb+half+lb+half;$("tki").style.setProperty("--td",Math.max(20,h.length*7)+"s");k.classList.add("show")}else k.classList.remove("show")}
   const B=R?R.brk:(b=>b.on?{rem:b.until?Math.max(0,b.until-Date.now()):null,kind:b.kind}:null)(rb());
   SC={on:!!B&&SCN,kind:B&&B.kind||"break",end:B&&B.rem!=null?(R?R.t:Date.now())+B.rem:0};
   const q=S.queue||[],ev=R&&R.ev,sk=JSON.stringify([SC.on,SC.kind,q.slice(0,5).map(x=>x.id),ev,!!CF.blind]);
@@ -286,27 +281,12 @@ function extra(S,c,r,th,name){
     $("sns").textContent=ev&&ev.cnt?"Средняя оценка вечера: "+ev.avg+" · треков: "+ev.cnt:""}
 }
 setInterval(()=>{if(!SC.on)return;$("snt").textContent=SC.end?fmt(Math.max(0,Math.ceil((SC.end-Date.now())/1000))):(SC.kind==="soon"?"…":"☕")},250);
+function fitTitle(){const e=$("ttl");let fs=CLIP?26:36;e.style.fontSize=fs+"px";while(fs>13&&e.scrollHeight>fs*1.15*2+2){fs--;e.style.fontSize=fs+"px"}}
 function flash(){const f=$("fl");f.classList.remove("go");void f.offsetWidth;f.classList.add("go")}
 function rain(){for(let i=0;i<26;i++){const d=document.createElement("i");d.className="ham";d.textContent=i%5?"🐹":"⭐";d.style.left=Math.random()*96+"%";d.style.animationDuration=(2.6+Math.random()*2.2)+"s";d.style.animationDelay=Math.random()*1.2+"s";STG.appendChild(d);setTimeout(()=>d.remove(),7000)}}
 function skull(){const d=document.createElement("div");d.className="skull";d.textContent="💀";STG.appendChild(d);setTimeout(()=>d.remove(),2600)}
-/* цвета из обложки: доминирующий оттенок; если браузер не даёт читать пиксели (CORS) — остаются цвета темы */
-const tc={};let lastTh="",tk2="";
-function setCol(c){const k=c?c.join():"";if(k===tk2)return;tk2=k;["--ac","--ac2","--a1","--a2","--a3"].forEach((p,i)=>c?STG.style.setProperty(p,c[[0,1,0,1,0][i]]):STG.style.removeProperty(p));$("au").classList.toggle("on",!!c)}
-function tint(th){lastTh=th||"";if(!th)return setCol(null);if(th in tc)return setCol(tc[th]);if(tc[th+"!"])return;tc[th+"!"]=1;
-  const im=new Image();im.crossOrigin="anonymous";
-  im.onload=()=>{let c=null;try{const g=document.createElement("canvas").getContext("2d");g.canvas.width=g.canvas.height=24;g.drawImage(im,0,0,24,24);const d=g.getImageData(0,0,24,24).data,b=Array(12).fill(0);
-    for(let i=0;i<d.length;i+=4){const r=d[i]/255,gg=d[i+1]/255,bb=d[i+2]/255,mx=Math.max(r,gg,bb),dl=mx-Math.min(r,gg,bb);if(dl<.15||mx<.25)continue;const h=(mx===r?((gg-bb)/dl+6)%6:mx===gg?(bb-r)/dl+2:(r-gg)/dl+4)*60;b[Math.floor(h/30)%12]+=dl*mx}
-    const i1=b.indexOf(Math.max(...b));if(b[i1]>0){let i2=-1,m2=0;b.forEach((v,i)=>{const dd=Math.min((i-i1+12)%12,(i1-i+12)%12);if(dd>=2&&v>m2){m2=v;i2=i}});const h1=i1*30+15,h2=i2>-1?i2*30+15:(h1+40)%360;c=["hsl("+h1+" 85% 58%)","hsl("+h2+" 85% 68%)"]}}catch(e){}
-    tc[th]=c;if(lastTh===th)setCol(c)};
-  im.onerror=()=>{tc[th]=null};im.src=th}
-/* визуализатор: имитация (у YouTube нет доступа к звуку); ритм зависит от id трека, на паузе затихает */
-const vz=$("vz"),vg=vz.getContext("2d"),E=Array(36).fill(.06);let VC=["#ff8a3d","#ffc46b"],fr=0;
-function loop(ts){requestAnimationFrame(loop);fr++;
-  if(fr%60===1){const cs=getComputedStyle(STG);VC=[cs.getPropertyValue("--ac").trim()||VC[0],cs.getPropertyValue("--ac2").trim()||VC[1]]}
-  const w=vz.width,h=vz.height,n=E.length,on=PG.has&&PG.play,t=ts/1000,sd=PG.seed%100,bpm=96+sd%48,kick=Math.pow(1-(t*bpm/60)%1,3),bw=w/n;
-  vg.clearRect(0,0,w,h);const gr=vg.createLinearGradient(0,h,0,0);gr.addColorStop(0,VC[0]);gr.addColorStop(1,VC[1]);vg.fillStyle=gr;
-  for(let i=0;i<n;i++){const x=i/n,tg=on?Math.min(1,.12+.4*(Math.sin(t*(1.3+i*.29)+sd+i*1.7)*.5+.5)*(.6+.4*Math.sin(t*.7+i*.4))+.55*kick*Math.pow(1-x,1.2)):.05;
-    E[i]+=(tg-E[i])*(tg>E[i]?.55:.14);const bh=Math.max(4,E[i]*h);vg.beginPath();vg.roundRect?vg.roundRect(i*bw+bw*.15,h-bh,bw*.7,bh,4):vg.rect(i*bw+bw*.15,h-bh,bw*.7,bh);vg.fill()}
+let fr=0;
+function loop(){requestAnimationFrame(loop);fr++;
   const el=PG.dur?Math.min(PG.dur,PG.pos+(PG.play?(Date.now()-PG.t)/1000:0)):(PG.t0?(Date.now()-PG.t0)/1000:0);
   $("pbi").style.width=PG.dur?(el/PG.dur*100)+"%":"100%";$("pbi").style.opacity=PG.dur?1:.25;
   if(fr%10===0){$("pa").textContent=fmt(el);$("pd").textContent=PG.dur?fmt(PG.dur):"в эфире"}}

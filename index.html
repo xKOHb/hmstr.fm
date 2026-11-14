@@ -252,6 +252,15 @@ html[data-compact=on] header{padding:8px 12px}
 html[data-compact=on] .card{padding:12px}
 .spark{margin:6px 0 2px}
 #soon.on{background:var(--ac);color:#111}
+.tags{display:flex;flex-direction:column;gap:10px;margin:12px 0}
+.tgr{display:flex;align-items:center;gap:12px}
+.tgl{flex:none;width:88px;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut);line-height:1.2}
+.tgs{display:flex;flex-wrap:wrap;gap:8px}
+.tags .tg{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:12px;font-size:14px;background:var(--in);border:1px solid var(--ln)}
+.tags .tg i{font-style:normal;font-size:16px;line-height:1}
+.tags .tg.on{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#1a1008;font-weight:700;border-color:transparent;box-shadow:0 4px 16px -6px var(--ac)}
+.tags .tg.qp{border-style:dashed;background:transparent;font-size:13px;padding:6px 12px}
+@media(max-width:560px){.tgr{flex-direction:column;align-items:flex-start;gap:6px}.tgl{width:auto}}
 html[data-mode=light]{color-scheme:light;--bg:color-mix(in srgb,var(--ac) 7%,#fbf8f5);--card:rgba(255,255,255,.78);--tx:#201a16;--mut:#6f625a;--ln:rgba(0,0,0,.11);--in:rgba(0,0,0,.05);--ac2:color-mix(in srgb,var(--ac) 62%,#000)}
 html[data-mode=light] .bg{background:radial-gradient(900px at 88% -8%,color-mix(in srgb,var(--ac) 26%,transparent),transparent),radial-gradient(700px at 0 105%,color-mix(in srgb,var(--ac) 18%,transparent),transparent),var(--bg)}
 html[data-mode=light] .bg::before{display:none}
@@ -318,8 +327,7 @@ html[data-mode=light] button:hover:not(:disabled){background:rgba(0,0,0,.06)}
   <div class="fld"><label for="c-cd">Пауза между заявками, сек</label><input type="number" id="c-cd" min="0" max="600"></div>
   <div class="fld"><label for="c-maxmin">Лимит длины трека, мин<small>0 — без лимита; проверяется для YouTube, у остальных длина неизвестна</small></label><input type="number" id="c-maxmin" min="0" max="120"></div>
   <div class="fld"><label for="c-lenskip">Пропускать треки длиннее лимита<small>выключено — только предупреждение</small></label><input type="checkbox" id="c-lenskip"></div>
-  <div class="fld"><label for="c-ytkey">YouTube API-ключ<small>для автозамены видео без встраивания; хранится только в этом браузере, в экспорт не попадает</small></label><input type="password" id="c-ytkey" autocomplete="off" placeholder="AIza…"></div>
-    <div class="fld"><label for="c-compact">Компактная панель<small>одна колонка, без подсказок и подсветки: удобно для маленького окна</small></label><input type="checkbox" id="c-compact"></div>
+      <div class="fld"><label for="c-compact">Компактная панель<small>одна колонка, без подсказок и подсветки: удобно для маленького окна</small></label><input type="checkbox" id="c-compact"></div>
   <div class="fld"><label for="c-mode">Тема оформления<small>тёмная, светлая или как в системе · клавиша D</small></label><select id="c-mode"><option value="dark">Тёмная</option><option value="light">Светлая</option><option value="auto">Как в системе</option></select></div>
   <div class="hint"><span class="dot" id="tw-dot"></span><span id="tw-st">выключено</span> · читает чат анонимно, отвечать не умеет. Пример: <b>!заказ Artist - Song</b></div>
   <div class="hint" id="tw-last"></div>
@@ -391,35 +399,9 @@ function mountYT(id){
 const noEmbedMsg='Автор запретил встраивать это видео.<br>Нажми <b>O</b> — трек откроется на YouTube';
 function stageMsg(h){const st=$("stage");st.classList.add("auto");st.innerHTML='<div class="idle"><div class="vinyl"></div><div>'+h+'</div></div>';player=null;playing=false;$("pp").disabled=true;setLive()}
 const decHtml=s=>{const t=document.createElement("textarea");t.innerHTML=s;return t.value};
-async function ytApi(path,params){
-  const u=new URL("https://www.googleapis.com/youtube/v3/"+path);
-  Object.entries({...params,key:(cfg.ytKey||"").trim()}).forEach(([k,v])=>u.searchParams.set(k,v));
-  const r=await fetch(u),j=await r.json().catch(()=>({}));
-  if(!r.ok){const e=new Error((j.error&&j.error.message)||r.status);e.reason=j.error&&j.error.errors&&j.error.errors[0]&&j.error.errors[0].reason;throw e}
-  return j;
-}
-async function findAlt(c){
-  try{
-    const id=ytId(c.text);let title=c.title,author=c.author||"";
-    if(!title){const j=await ytApi("videos",{part:"snippet",id}),sn=j.items&&j.items[0]&&j.items[0].snippet;if(sn){title=sn.title;author=sn.channelTitle||""}}
-    if(!title)return null;
-    const base=cleanTitle(plName({text:c.text,title,author})||title);if(!base)return null;
-    const j=await ytApi("search",{part:"snippet",type:"video",videoEmbeddable:"true",videoSyndicated:"true",maxResults:"8",q:base.replace(/\s[–—]\s/," - ")+" lyrics"});
-    const bad=/\b(cover|remix|sped\s*up|slowed|reverb|nightcore|8d|karaoke|instrumental|live|reaction)\b/i;
-    const items=(j.items||[]).filter(x=>x.id&&x.id.videoId&&x.id.videoId!==id);
-    const pick=items.find(x=>!(bad.test(x.snippet.title)&&!bad.test(title)))||items[0];
-    return pick?{id:pick.id.videoId,title:pick.snippet.title,title0:title,author0:author}:null;
-  }catch(e){toast(e.reason==="quotaExceeded"?"Лимит YouTube API на сегодня исчерпан":"Автозамена: ошибка API ("+(e.reason||e.message)+")");return null}
-}
-function applyAlt(c,r){
-  const cur=S.current;if(!cur||cur.id!==c.id)return;
-  cur.orig=cur.text;cur.text="https://www.youtube.com/watch?v="+r.id;
-  if(!cur.title&&r.title0){cur.title=r.title0;cur.author=cur.author||r.author0}
-  cur.name=plName(cur);save();show();toast("🔁 Заменил на: "+decHtml(r.title));
-}
 function embedFail(){
   const c=S.current;
-  stageMsg('Автор запретил встраивать это видео.<br>Иногда помогает обновить плеер, или нажми <b>O</b> — трек откроется на YouTube.<div class="row" style="justify-content:center;margin-top:10px"><button data-retry="1">↻ Обновить плеер</button><button data-alt="1">🔁 Другая версия</button></div>');
+  stageMsg('Автор запретил встраивать это видео.<br>Иногда помогает обновить плеер, или нажми <b>O</b> — трек откроется на YouTube.<div class="row" style="justify-content:center;margin-top:10px"><button data-retry="1">↻ Обновить плеер</button><button data-open="1">↗ Открыть в новой вкладке</button></div>');
   if(c){c.noemb=true;save();coverFor(c,true)}
 }
 function grab(){try{const d=player.getVideoData(),c=S.current;if(!d||!c||!d.title)return;if(!c.title||(!c.author&&d.author)){c.title=c.title||d.title;c.author=c.author||d.author||"";c.name=plName(c);save();renderNow(false);renderLists()}}catch(e){}}
@@ -450,14 +432,14 @@ const col=n=>`hsl(${(n-1)*13} 85% 58%)`;
 $("rate").innerHTML=[1,2,3,4,5,6,7,8,9,10].map(n=>`<button data-r="${n}" style="color:${col(n)}">${n}</button>`).join("");
 let votes={},brk={on:false,until:0};
 const TAGS=[["🔥","хит"],["😢","грустный"],["💃","танцевальный"],["🤔","странный"],["💤","скучный"]],QP=["огонь","мимо","ещё раз","в плейлист!"];
-function renderTags(){const c=S.current,on=t=>c&&(c.tags||[]).includes(t);
-  $("tags").innerHTML=TAGS.map(([e,t])=>`<button class="tg${on(t)?" on":""}" data-tag="${t}"${c?"":" disabled"}>${e} ${t}</button>`).join("")+QP.map(q=>`<button class="tg qp" data-qp="${q}"${c?"":" disabled"}>+ ${q}</button>`).join("")}
+function renderTags(){const c=S.current,on=t=>c&&(c.tags||[]).includes(t),d=c?"":" disabled";
+  $("tags").innerHTML=`<div class="tgr"><span class="tgl">Настроение</span><div class="tgs">${TAGS.map(([e,t])=>`<button class="tg${on(t)?" on":""}" data-tag="${t}"${d}><i>${e}</i>${t}</button>`).join("")}</div></div><div class="tgr"><span class="tgl">Быстрый комментарий</span><div class="tgs">${QP.map(q=>`<button class="tg qp" data-qp="${q}"${d}>${q}</button>`).join("")}</div></div>`}
 function renderNow(resetNote){
   const c=S.current;
   $("ttl").textContent=c?plName(c):"Ничего не играет";
   $("src").textContent=c?src(c.text):"HMSTR.FM";
   $("sub").textContent=c?`от ${blindNow()?"???":"@"+c.nick}${c.author?" · "+c.author:""}${c.comment&&!blindNow()?" · «"+c.comment+"»":""}`:"Возьми трек из очереди";
-  document.querySelectorAll("#rate button").forEach(b=>{const on=c&&c.rating===+b.dataset.r;b.classList.toggle("sel",!!on);b.style.background=on?col(+b.dataset.r):"";});
+  document.querySelectorAll("#rate button").forEach(b=>{const on=c&&c.rating===+b.dataset.r;b.classList.toggle("sel",!!on);b.style.background=on?col(+b.dataset.r):"";b.style.color=on?"#111":col(+b.dataset.r);});
   $("rl").textContent=(c&&c.rating?`${c.rating}/10 · ${LBL(c.rating)}`:"")+(c&&c.vn?`${c.rating?" · ":""}💬 чат: ${c.vavg} (${c.vn})`:"");
   $("pl").className=c&&c.pl?"on":"";$("pl").textContent=c&&c.pl?"♥ В плейлисте (P)":"♡ В плейлист (P)";
   ["pl","sk","op"].forEach(i=>$(i).disabled=!c);document.querySelectorAll("#rate button").forEach(b=>b.disabled=!c);$("note").disabled=!c;
@@ -518,7 +500,7 @@ $("clr").onclick=()=>{if(confirm("Очистить очередь и истор�
   S=fixS();save();show()}};
 
 const CFGK="hmstr_cfg";
-let cfg={chan:"",bot:false,cmds:"!заказ,!sr,!order",maxq:2,cd:30,clean:true,copy:"names",fxBg:true,fxBurst:true,ovq:true,snd:"panel",blind:false,banNicks:"",banWords:"",conf:true,sndVol:25,room:"",maxMin:8,lenSkip:true,autoAlt:true,ytKey:"",compact:false,mode:"dark"};
+let cfg={chan:"",bot:false,cmds:"!заказ,!sr,!order",maxq:2,cd:30,clean:true,copy:"names",fxBg:true,fxBurst:true,ovq:true,snd:"panel",blind:false,banNicks:"",banWords:"",conf:true,sndVol:25,room:"",maxMin:8,lenSkip:true,compact:false,mode:"dark"};
 try{Object.assign(cfg,JSON.parse(ls.get(CFGK)||"{}"))}catch(e){}
 const cfgSave=()=>ls.set(CFGK,JSON.stringify(cfg));
 function chanName(v){v=String(v||"").trim().toLowerCase();const m=v.match(/twitch\.tv\/(?:popout\/)?([a-z0-9_]+)/);if(m)v=m[1];return v.replace(/^[#@]/,"").replace(/[^a-z0-9_]/g,"")}
@@ -583,7 +565,7 @@ function onChat(tags,login,msg){
 /* settings UI */
 $("tgrid").innerHTML=THEMES.map(([k,n,g])=>`<button class="tc" data-t="${k}"><div class="pv" style="background:${g}"></div><span>${n}</span></button>`).join("");
 $("tgrid").onclick=e=>{const b=e.target.closest(".tc");if(b)setTheme(b.dataset.t)};
-[["c-chan","chan","s"],["c-bot","bot","b"],["c-cmds","cmds","s"],["c-maxq","maxq","n"],["c-cd","cd","n"],["c-maxmin","maxMin","n"],["c-lenskip","lenSkip","b"],["c-ytkey","ytKey","s"],["c-compact","compact","b"],["c-mode","mode","s"],["c-clean","clean","b"],["c-copy","copy","s"],["c-fxbg","fxBg","b"],["c-fxb","fxBurst","b"],["c-ovq","ovq","b"],["c-sndv","sndVol","n"],["c-snd","snd","s"],["c-blind","blind","b"],["c-bann","banNicks","s"],["c-banw","banWords","s"],["c-conf","conf","b"]].forEach(([id,k,ty])=>{
+[["c-chan","chan","s"],["c-bot","bot","b"],["c-cmds","cmds","s"],["c-maxq","maxq","n"],["c-cd","cd","n"],["c-maxmin","maxMin","n"],["c-lenskip","lenSkip","b"],["c-compact","compact","b"],["c-mode","mode","s"],["c-clean","clean","b"],["c-copy","copy","s"],["c-fxbg","fxBg","b"],["c-fxb","fxBurst","b"],["c-ovq","ovq","b"],["c-sndv","sndVol","n"],["c-snd","snd","s"],["c-blind","blind","b"],["c-bann","banNicks","s"],["c-banw","banWords","s"],["c-conf","conf","b"]].forEach(([id,k,ty])=>{
   const el=$(id);if(ty==="b")el.checked=!!cfg[k];else el.value=cfg[k];
   el.onchange=()=>{cfg[k]=ty==="b"?el.checked:ty==="n"?+el.value:el.value.trim();if(k==="chan"){cfg.chan=chanName(el.value);el.value=cfg.chan}cfgSave();applyCfg();bcast();
     if(k==="chan"||k==="bot")twConnect();if(k==="blind"){renderNow(false);renderLists()}
@@ -765,10 +747,7 @@ async function coverFor(c,force){
 $("stage").addEventListener("click",e=>{
   const c=S.current;if(!c)return;
   if(e.target.closest("[data-retry]")){c.noemb=false;save();renderStage();return}
-  if(e.target.closest("[data-alt]")){
-    if(!(cfg.ytKey||"").trim())return toast("Нужен YouTube API-ключ (⚙️ настройки)");
-    stageMsg("Ищу другую версию (lyrics)…");
-    findAlt(c).then(r=>{if(!S.current||S.current.id!==c.id)return;if(r)applyAlt(c,r);else embedFail()})}
+  if(e.target.closest("[data-open]"))openTrack();
 });
 applyCfg();twConnect();peerStart();
 setTheme(theme);show();
