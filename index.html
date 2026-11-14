@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="HMSTR.FM — радио-стрим: присылай треки, а ведущая слушает, оценивает и добавляет в плейлист.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="HMSTR.FM — радио-стрим">
+<meta property="og:description" content="Кидай трек — услышишь в эфире. Заявки, оценки и плейлист вечера.">
+<meta property="og:image" content="https://YOUR-DOMAIN/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://YOUR-DOMAIN/og.png">
+<title>HMSTR.FM — панель эфира</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🐹%3C/text%3E%3C/svg%3E">
+<style>
+:root{--bg:#fbf7f2;--card:#fff;--tx:#241a14;--mut:#85766b;--ac:#e8742c;--ln:#eadfd4;--ok:#2f9e5b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17120f;--card:#231c17;--tx:#f5ece4;--mut:#a39284;--ac:#ff8a3d;--ln:#352b24;--ok:#4cc27f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17120f;--card:#231c17;--tx:#f5ece4;--mut:#a39284;--ac:#ff8a3d;--ln:#352b24;--ok:#4cc27f;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--ln)}
+.logo{font-weight:800;font-size:22px;letter-spacing:.5px}.logo b{color:var(--ac)}
+main{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 20px;max-width:1200px;margin:auto}
+@media(max-width:820px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:16px}
+h2{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--mut)}
+input,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--ln);background:var(--bg);color:var(--tx);font:inherit;margin-bottom:8px}
+button{cursor:pointer;border:1px solid var(--ln);background:var(--bg);color:var(--tx);padding:8px 12px;border-radius:10px;font:inherit}
+button.p{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
+button.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.item{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-top:1px solid var(--ln);align-items:center}
+.item:first-of-type{border-top:0}
+.t{font-weight:600;word-break:break-word}.m{color:var(--mut);font-size:13px}
+.now{grid-column:1/-1}
+.rate{display:flex;gap:4px;flex-wrap:wrap;margin:10px 0}
+.rate button{width:38px;height:38px;padding:0}
+iframe{width:100%;height:220px;border:0;border-radius:10px;margin-top:8px;background:#000}
+.big{font-size:24px;font-weight:700;word-break:break-word}
+.empty{color:var(--mut);padding:8px 0}
+.kbd{font-size:12px;color:var(--mut)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">HMSTR<b>.FM</b> <span class="m">панель эфира</span></div>
+  <div class="row"><button id="exp">Скопировать плейлист</button><button id="clr">Новый эфир</button></div>
+</header>
+<main>
+  <section class="card now" id="now"></section>
+  <section class="card">
+    <h2>Добавить заявку из чата</h2>
+    <input id="f-t" placeholder="Ссылка или название трека">
+    <input id="f-n" placeholder="Ник зрителя">
+    <input id="f-c" placeholder="Комментарий (необязательно)">
+    <button class="p" id="add">Добавить в очередь</button>
+    <div class="kbd" style="margin-top:8px">Горячие клавиши: N — следующий, O — открыть трек, 1–9 и 0 — оценка (0 = 10), P — в плейлист, S — пропустить</div>
+    <h2 style="margin-top:18px">Очередь <span id="qc"></span></h2>
+    <div id="queue"></div>
+  </section>
+  <section class="card">
+    <h2>История эфира</h2>
+    <div id="hist"></div>
+  </section>
+</main>
+<script>
+const KEY="hmstr_fm_v1";
+let S={queue:[],current:null,history:[]};
+try{const r=localStorage.getItem(KEY);if(r)S=JSON.parse(r)}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const isUrl=s=>/^https?:\/\//i.test(s);
+function embed(u){
+  if(!isUrl(u))return"";
+  let m=u.match(/(?:youtu\.be\/|v=)([\w-]{11})/);
+  if(m)return`https://www.youtube.com/embed/${m[1]}?autoplay=1`;
+  m=u.match(/open\.spotify\.com\/(track|album|playlist)\/(\w+)/);
+  if(m)return`https://open.spotify.com/embed/${m[1]}/${m[2]}`;
+  return"";
+}
+function add(){
+  const t=$("f-t").value.trim();if(!t)return;
+  S.queue.push({id:Date.now()+Math.random(),text:t,nick:$("f-n").value.trim()||"аноним",comment:$("f-c").value.trim()});
+  $("f-t").value="";$("f-c").value="";$("f-t").focus();save();render();
+}
+function finish(skipped){
+  if(!S.current)return;
+  S.history.unshift({...S.current,skipped:!!skipped});S.current=null;
+}
+function next(){
+  if(!S.queue.length)return;
+  finish();S.current={...S.queue.shift(),rating:null,note:"",pl:false};save();render();
+}
+function openTrack(){
+  if(!S.current)return;const t=S.current.text;
+  window.open(isUrl(t)?t:"https://www.youtube.com/results?search_query="+encodeURIComponent(t),"_blank","noopener");
+}
+function skip(){finish(true);save();render()}
+function rate(n){if(S.current){S.current.rating=n;save();render()}}
+function toPl(){if(S.current){S.current.pl=!S.current.pl;save();render()}}
+function render(){
+  const c=S.current;
+  $("now").innerHTML=c?`<h2>Сейчас играет</h2>
+   <div class="big">${esc(c.text)}</div>
+   <div class="m">от @${esc(c.nick)}${c.comment?" · «"+esc(c.comment)+"»":""}${isUrl(c.text)?` · <a style="color:var(--ac)" href="${esc(c.text)}" target="_blank" rel="noopener">открыть ссылку</a>`:""}</div>
+   ${embed(c.text)?`<iframe src="${embed(c.text)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`:""}
+   <div class="row" style="margin-top:8px"><button id="op">${isUrl(c.text)?"Открыть в новой вкладке (O)":"Найти в YouTube (O)"}</button></div>
+   <div class="rate">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="${c.rating===n?"p":""}" data-r="${n}">${n}</button>`).join("")}</div>
+   <input id="note" placeholder="Заметка к треку" value="${esc(c.note)}">
+   <div class="row"><button class="${c.pl?"on":""}" id="pl">${c.pl?"✓ В плейлисте":"В плейлист"}</button><button id="sk">Пропустить</button><button class="p" id="nx">Следующий →</button></div>`
+  :`<h2>Сейчас играет</h2><div class="empty">Ничего не играет.</div><button class="p" id="nx">Взять следующий из очереди</button>`;
+  $("qc").textContent=S.queue.length?`(${S.queue.length})`:"";
+  $("queue").innerHTML=S.queue.length?S.queue.map(q=>`<div class="item"><div><div class="t">${esc(q.text)}</div><div class="m">@${esc(q.nick)}${q.comment?" · "+esc(q.comment):""}</div></div><button data-d="${q.id}">✕</button></div>`).join(""):`<div class="empty">Очередь пуста.</div>`;
+  $("hist").innerHTML=S.history.length?S.history.map(h=>`<div class="item"><div><div class="t">${esc(h.text)}</div><div class="m">@${esc(h.nick)}${h.note?" · "+esc(h.note):""}${h.pl?" · 📌 в плейлисте":""}${h.skipped?" · пропущен":""}</div></div><div class="big">${h.rating??"–"}</div></div>`).join(""):`<div class="empty">Пока пусто.</div>`;
+  const nx=$("nx"),sk=$("sk"),pl=$("pl"),nt=$("note");
+  const op=$("op");if(op)op.onclick=openTrack;
+  if(nx)nx.onclick=next;if(sk)sk.onclick=skip;if(pl)pl.onclick=toPl;
+  if(nt)nt.oninput=e=>{S.current.note=e.target.value;save()};
+}
+document.addEventListener("click",e=>{
+  const r=e.target.closest("[data-r]");if(r)rate(+r.dataset.r);
+  const d=e.target.closest("[data-d]");if(d){S.queue=S.queue.filter(q=>String(q.id)!==d.dataset.d);save();render()}
+});
+document.addEventListener("keydown",e=>{
+  if(/INPUT|TEXTAREA/.test(document.activeElement.tagName)){if(e.key==="Enter"&&document.activeElement.id.startsWith("f-"))add();return}
+  const k=e.key.toLowerCase();
+  if(k==="n")next();else if(k==="s")skip();else if(k==="p")toPl();else if(k==="o")openTrack();
+  else if(/^[1-9]$/.test(k))rate(+k);else if(k==="0")rate(10);
+});
+$("add").onclick=add;
+$("exp").onclick=async()=>{
+  const all=[S.current,...S.history].filter(x=>x&&x.pl).map(x=>x.text).join("\n");
+  const b=$("exp");
+  try{await navigator.clipboard.writeText(all);b.textContent=all?"Скопировано ✓":"Плейлист пуст"}catch(e){b.textContent="Не удалось скопировать"}
+  setTimeout(()=>b.textContent="Скопировать плейлист",1800);
+};
+$("clr").onclick=()=>{if(confirm("Очистить очередь и историю?")){S={queue:[],current:null,history:[]};save();render()}};
+render();
+</script>
+</body>
+</html>
