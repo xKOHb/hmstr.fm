@@ -359,6 +359,7 @@ window.onYouTubeIframeAPIReady=()=>{ytReady=true;if(pending){mountYT(pending);pe
 function mountYT(id){
   player=new YT.Player("yt",{videoId:id,width:"100%",height:"100%",playerVars:{autoplay:1,rel:0,playsinline:1,modestbranding:1},events:{
     onReady:e=>{applyVol();e.target.playVideo();grab()},
+    onError:e=>toast("YouTube не играет это видео (код "+e.data+")"),
     onStateChange:e=>{playing=e.data===1;$("pp").textContent=playing?"⏸":"▶";grab();setLive();bcast()}}});
 }
 function grab(){try{const d=player.getVideoData(),c=S.current;if(!d||!c||!d.title)return;if(!c.title||(!c.author&&d.author)){c.title=c.title||d.title;c.author=c.author||d.author||"";c.name=plName(c);save();renderNow(false);renderLists()}}catch(e){}}
@@ -494,6 +495,7 @@ function onChat(tags,login,msg){
   const t={};(tags||"").split(";").forEach(p=>{const i=p.indexOf("=");if(i>0)t[p.slice(0,i)]=p.slice(i+1)});
   const nick=t["display-name"]||login,cmds=cfg.cmds.split(",").map(x=>x.trim().toLowerCase()).filter(Boolean);
   const lt=$("tw-last");if(lt)lt.textContent="Последнее в чате: "+(cfg.blind?"":nick+": ")+msg.slice(0,50);
+  try{if(!msg.startsWith("!")&&!/^(nightbot|streamelements|streamlabs|moobot|fossabot)$/i.test(login)){const m={type:"chat",nick,color:t.color||"",text:msg.slice(0,200)};conns.forEach(c=>c.open&&c.send(m))}}catch(e){}
   const sp=msg.trim().split(/\s+/),text=sp.slice(1).join(" ").trim().slice(0,300);
   if(!cmds.includes(sp[0].toLowerCase())||!text)return;
   const bn=lst(cfg.banNicks);if(bn.includes(login.toLowerCase())||bn.includes(nick.toLowerCase()))return;

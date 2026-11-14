@@ -60,6 +60,13 @@ body.green{background:#00ff00}
 .q{font-size:20px;padding:5px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:qin .5s backwards}
 .q span{color:var(--ac);font-weight:800;margin-right:8px}
 @keyframes qin{from{opacity:0;transform:translateX(20px)}}
+/* чат Twitch */
+.chat{position:absolute;left:56px;bottom:270px;width:560px;max-height:300px;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;overflow:hidden;pointer-events:none}
+[data-cp=bl] .chat{bottom:auto;top:110px;justify-content:flex-start}
+.cm{background:var(--card);border:1px solid color-mix(in srgb,var(--ac) 35%,transparent);border-radius:16px;padding:8px 14px;font-size:22px;line-height:1.25;word-break:break-word;backdrop-filter:blur(8px);animation:cin .35s backwards;transition:opacity .6s}
+.cm b{margin-right:6px}
+.cm.old{opacity:0}
+@keyframes cin{from{opacity:0;transform:translateX(-20px)}}
 /* окно клипа / обложки */
 .clip{position:absolute;display:none;width:var(--cw,800px);aspect-ratio:16/9;border-radius:26px;border:3px solid color-mix(in srgb,var(--ac) 70%,transparent);background:#000;box-shadow:0 0 44px -8px var(--ac),0 14px 40px rgba(0,0,0,.5);overflow:hidden;opacity:0;transform:translateY(40px) scale(.96);transition:opacity .6s,transform .7s cubic-bezier(.2,1.2,.4,1);pointer-events:none}
 #st.hasclip .clip{display:block}
@@ -85,6 +92,7 @@ body.green{background:#00ff00}
 <body>
 <div id="st">
 <div class="logo" id="logo">HMSTR<b>.FM</b></div>
+<div class="chat" id="chat"></div>
 <div class="clip" id="clip"><div class="cimg" id="cimg"></div><div class="cvid" id="cvid"><div id="yt"></div></div></div>
 <div class="wrap"><div class="card" id="card">
   <div class="cover"><div class="disc"></div><div id="cv"></div></div>
@@ -105,6 +113,17 @@ STG.dataset.cp=["br","bl","tr","tl","c"].includes(P.get("cp"))?P.get("cp"):"br";
 if(CLIP){STG.classList.add("hasclip");$("card").classList.add("nc");const w=parseInt(P.get("cw"),10);if(w)STG.style.setProperty("--cw",Math.max(320,Math.min(1400,w))+"px")}
 function fit(){const k=Math.min(innerWidth/1920,innerHeight/1080);STG.style.transform="scale("+k+")";STG.style.left=(innerWidth-1920*k)/2+"px";STG.style.top=(innerHeight-1080*k)/2+"px"}
 addEventListener("resize",fit);fit();
+/* чат: ?chat=0 — скрыть; ?chatt=30 — сколько секунд живёт сообщение */
+const CHAT=P.get("chat")!=="0",CHT=Math.max(5,parseInt(P.get("chatt"),10)||30);
+if(!CHAT)$("chat").style.display="none";
+function addChat(d){
+  if(!CHAT||!d||!d.text)return;
+  const box=$("chat"),m=document.createElement("div"),b=document.createElement("b");
+  m.className="cm";b.textContent=d.nick||"";b.style.color=/^#[0-9a-f]{6}$/i.test(d.color||"")?d.color:"var(--ac2)";
+  m.appendChild(b);m.appendChild(document.createTextNode(String(d.text).slice(0,200)));box.appendChild(m);
+  while(box.children.length>7)box.firstChild.remove();
+  setTimeout(()=>{m.classList.add("old");setTimeout(()=>m.remove(),700)},CHT*1000);
+}
 const showQ=P.get("q")!=="0";
 const rd=()=>{try{return JSON.parse(localStorage.getItem("hmstr_fm_v1"))||{}}catch(e){return{}}};
 const rc=()=>{try{return JSON.parse(localStorage.getItem("hmstr_cfg"))||{}}catch(e){return{}}};
@@ -189,7 +208,7 @@ function rJoin(){
   if(!rPeer||rPeer.destroyed){try{rPeer=new Peer()}catch(e){return retry(5000)}rPeer.on("open",rJoin);rPeer.on("error",()=>retry(4000));rPeer.on("disconnected",()=>{try{rPeer.reconnect()}catch(e){}});return}
   if(!rPeer.open)return;
   try{rConn=rPeer.connect("hmstrfm-"+ROOM,{reliable:true})}catch(e){return retry()}
-  const c=rConn;c.on("data",d=>{remote=d;upd()});c.on("close",()=>retry());c.on("error",()=>retry());
+  const c=rConn;c.on("data",d=>{if(d&&d.type==="chat"){addChat(d);return}remote=d;upd()});c.on("close",()=>retry());c.on("error",()=>retry());
   setTimeout(()=>{if(!c.open){try{c.close()}catch(e){}retry(500)}},8000);
 }
 addEventListener("storage",upd);
