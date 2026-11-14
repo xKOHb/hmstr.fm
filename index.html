@@ -130,6 +130,11 @@ kbd{background:var(--in);border:1px solid var(--ln);border-radius:6px;padding:1p
 [data-theme=retro] .bg::before{inset:-60%;background:repeating-conic-gradient(at 50% 60%,rgba(255,176,46,.11) 0 7deg,transparent 7deg 14deg);animation:spin 160s linear infinite}
 [data-theme=retro] .bg::after{background:repeating-radial-gradient(circle at 50% 60%,transparent 0 60px,rgba(255,107,61,.09) 61px 64px);animation:rip 10s ease-in-out infinite alternate}
 html[data-fx=off] .bg::before,html[data-fx=off] .bg::after{animation:none}
+/* лёгкий режим: без анимаций фона, размытий и свечения плеера */
+html[data-lite=on] .ambient{display:none!important}
+html[data-lite=on] .bg::before,html[data-lite=on] .bg::after{animation:none!important}
+html[data-lite=on] .card,html[data-lite=on] header{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html[data-lite=on] body.live .stage{box-shadow:none}
 /* settings, on-air, stage */
 .air{font-size:11px;font-weight:800;letter-spacing:1.5px;padding:5px 11px;border-radius:99px;border:1px solid var(--ln);color:var(--mut)}
 .air.on{color:#fff;background:#e5254a;border-color:#e5254a;animation:glow 1.3s ease-in-out infinite alternate}
@@ -321,13 +326,14 @@ html[data-mode=light] button:hover:not(:disabled){background:rgba(0,0,0,.06)}
   <div class="row"><button id="t-j">▶ Джингл</button><button id="t-a">▶ Аплодисменты</button><button id="t-h">▶ Эйрхорн</button><button id="t-f">▶ Фейл</button></div>
   <h3>Чат Twitch</h3>
   <div class="fld"><label for="c-bot">Принимать заявки из чата</label><input type="checkbox" id="c-bot"></div>
-  <div class="fld"><label for="c-chan">Канал</label><input type="text" id="c-chan" placeholder="например, hmstr"></div>
+  <div class="fld"><label for="c-chan">Канал</label><input type="text" id="c-chan" placeholder="например, h_mst_r"></div>
   <div class="fld"><label for="c-cmds">Команды</label><input type="text" id="c-cmds"></div>
   <div class="fld"><label for="c-maxq">Заявок от зрителя в очереди</label><input type="number" id="c-maxq" min="1" max="20"></div>
   <div class="fld"><label for="c-cd">Пауза между заявками, сек</label><input type="number" id="c-cd" min="0" max="600"></div>
   <div class="fld"><label for="c-maxmin">Лимит длины трека, мин<small>0 — без лимита; проверяется для YouTube, у остальных длина неизвестна</small></label><input type="number" id="c-maxmin" min="0" max="120"></div>
   <div class="fld"><label for="c-lenskip">Пропускать треки длиннее лимита<small>выключено — только предупреждение</small></label><input type="checkbox" id="c-lenskip"></div>
       <div class="fld"><label for="c-compact">Компактная панель<small>одна колонка, без подсказок и подсветки: удобно для маленького окна</small></label><input type="checkbox" id="c-compact"></div>
+  <div class="fld"><label for="c-lite">Лёгкий режим<small>если панель тормозит: без анимированного фона, размытий и свечения плеера</small></label><input type="checkbox" id="c-lite"></div>
   <div class="fld"><label for="c-mode">Тема оформления<small>тёмная, светлая или как в системе · клавиша D</small></label><select id="c-mode"><option value="dark">Тёмная</option><option value="light">Светлая</option><option value="auto">Как в системе</option></select></div>
   <div class="hint"><span class="dot" id="tw-dot"></span><span id="tw-st">выключено</span> · читает чат анонимно, отвечать не умеет. Пример: <b>!заказ Artist - Song</b></div>
   <div class="hint" id="tw-last"></div>
@@ -505,12 +511,12 @@ function clearAll(){
   S=fixS();save();show();toast("Всё очищено ✓");return true}
 $("clr-all").onclick=()=>{if(clearAll())$("modal").classList.remove("open")};
 const CFGK="hmstr_cfg";
-let cfg={chan:"",bot:false,cmds:"!заказ,!sr,!order",maxq:2,cd:30,clean:true,copy:"names",fxBg:true,fxBurst:true,ovq:true,snd:"panel",blind:false,banNicks:"",banWords:"",conf:true,sndVol:25,room:"",maxMin:8,lenSkip:true,compact:false,mode:"dark"};
+let cfg={chan:"",bot:false,cmds:"!заказ,!sr,!order",maxq:2,cd:30,clean:true,copy:"names",fxBg:true,fxBurst:true,ovq:true,snd:"panel",blind:false,banNicks:"",banWords:"",conf:true,sndVol:25,room:"",maxMin:8,lenSkip:true,compact:false,lite:false,mode:"dark"};
 try{Object.assign(cfg,JSON.parse(ls.get(CFGK)||"{}"))}catch(e){}
 const cfgSave=()=>ls.set(CFGK,JSON.stringify(cfg));
 function chanName(v){v=String(v||"").trim().toLowerCase();const m=v.match(/twitch\.tv\/(?:popout\/)?([a-z0-9_]+)/);if(m)v=m[1];return v.replace(/^[#@]/,"").replace(/[^a-z0-9_]/g,"")}
-cfg.chan=chanName(cfg.chan);if(!cfg.room){cfg.room=Math.random().toString(36).slice(2,12);cfgSave()}
-function applyCfg(){document.documentElement.dataset.mode=cfg.mode==="auto"?(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"):cfg.mode==="light"?"light":"dark";document.documentElement.dataset.fx=cfg.fxBg?"on":"off";document.documentElement.dataset.compact=cfg.compact?"on":"off";$("bl").style.display=cfg.blind?"":"none"}
+cfg.chan=chanName(cfg.chan||"h_mst_r");if(!cfg.room){cfg.room=Math.random().toString(36).slice(2,12);cfgSave()}
+function applyCfg(){document.documentElement.dataset.mode=cfg.mode==="auto"?(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"):cfg.mode==="light"?"light":"dark";document.documentElement.dataset.fx=cfg.fxBg?"on":"off";document.documentElement.dataset.compact=cfg.compact?"on":"off";document.documentElement.dataset.lite=cfg.lite?"on":"off";$("bl").style.display=cfg.blind?"":"none"}
 /* clean names for playlist */
 function cleanTitle(t){
   t=String(t||"");if(!cfg.clean)return t.trim();
@@ -570,7 +576,7 @@ function onChat(tags,login,msg){
 /* settings UI */
 $("tgrid").innerHTML=THEMES.map(([k,n,g])=>`<button class="tc" data-t="${k}"><div class="pv" style="background:${g}"></div><span>${n}</span></button>`).join("");
 $("tgrid").onclick=e=>{const b=e.target.closest(".tc");if(b)setTheme(b.dataset.t)};
-[["c-chan","chan","s"],["c-bot","bot","b"],["c-cmds","cmds","s"],["c-maxq","maxq","n"],["c-cd","cd","n"],["c-maxmin","maxMin","n"],["c-lenskip","lenSkip","b"],["c-compact","compact","b"],["c-mode","mode","s"],["c-clean","clean","b"],["c-copy","copy","s"],["c-fxbg","fxBg","b"],["c-fxb","fxBurst","b"],["c-ovq","ovq","b"],["c-sndv","sndVol","n"],["c-snd","snd","s"],["c-blind","blind","b"],["c-bann","banNicks","s"],["c-banw","banWords","s"],["c-conf","conf","b"]].forEach(([id,k,ty])=>{
+[["c-chan","chan","s"],["c-bot","bot","b"],["c-cmds","cmds","s"],["c-maxq","maxq","n"],["c-cd","cd","n"],["c-maxmin","maxMin","n"],["c-lenskip","lenSkip","b"],["c-compact","compact","b"],["c-lite","lite","b"],["c-mode","mode","s"],["c-clean","clean","b"],["c-copy","copy","s"],["c-fxbg","fxBg","b"],["c-fxb","fxBurst","b"],["c-ovq","ovq","b"],["c-sndv","sndVol","n"],["c-snd","snd","s"],["c-blind","blind","b"],["c-bann","banNicks","s"],["c-banw","banWords","s"],["c-conf","conf","b"]].forEach(([id,k,ty])=>{
   const el=$(id);if(ty==="b")el.checked=!!cfg[k];else el.value=cfg[k];
   el.onchange=()=>{cfg[k]=ty==="b"?el.checked:ty==="n"?+el.value:el.value.trim();if(k==="chan"){cfg.chan=chanName(el.value);el.value=cfg.chan}cfgSave();applyCfg();bcast();
     if(k==="chan"||k==="bot")twConnect();if(k==="blind"){renderNow(false);renderLists()}
@@ -579,9 +585,10 @@ $("tgrid").onclick=e=>{const b=e.target.closest(".tc");if(b)setTheme(b.dataset.t
 $("gear").onclick=()=>$("modal").classList.add("open");
 $("mclose").onclick=()=>$("modal").classList.remove("open");
 $("modal").onclick=e=>{if(e.target===$("modal"))$("modal").classList.remove("open")};
-const ovLink=()=>location.origin+"/overlay.html?room="+cfg.room+(cfg.ovq?"":"&q=0");
+const ovQ=()=>"room="+cfg.room+(cfg.ovq?"":"&q=0")+(cfg.chan?"&chan="+encodeURIComponent(cfg.chan):"");
+const ovLink=()=>location.origin+"/overlay.html?"+ovQ();
 $("ov-copy").onclick=async()=>{try{await navigator.clipboard.writeText(ovLink());toast("Ссылка скопирована ✓")}catch(e){toast(ovLink())}};
-$("ov-win").onclick=()=>window.open("/overlay.html?bg=green&room="+cfg.room+(cfg.ovq?"":"&q=0"),"hmstr_overlay","width=980,height=420");
+$("ov-win").onclick=()=>window.open("/overlay.html?bg=green&"+ovQ(),"hmstr_overlay","width=980,height=420");
 $("d-exp").onclick=()=>{const b=new Blob([JSON.stringify({S,cfg:(({ytKey,...r})=>r)(cfg),arch:(()=>{try{return JSON.parse(ls.get("hmstr_arch")||"[]")}catch(e){return[]}})()},null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="hmstr-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 $("d-imp").onclick=()=>$("d-file").click();
 $("d-file").onchange=async e=>{try{const j=JSON.parse(await e.target.files[0].text());if(j.S){S=fixS(j.S);save()}if(Array.isArray(j.arch)&&j.arch.length)ls.set("hmstr_arch",JSON.stringify(j.arch.slice(-60)));if(j.cfg){Object.assign(cfg,j.cfg);cfgSave();location.reload();return}show();toast("Импортировано ✓")}catch(x){toast("Не удалось прочитать файл")}};
