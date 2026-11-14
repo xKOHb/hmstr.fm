@@ -65,7 +65,7 @@ body.green{background:#00ff00}
 .q{font-size:20px;padding:5px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:qin .5s backwards}
 .q span{color:var(--ac);font-weight:800;margin-right:8px}
 @keyframes qin{from{opacity:0;transform:translateX(20px)}}
-.xchat{position:absolute;left:0;top:0;width:520px;height:640px;border:0;background:transparent;pointer-events:none;display:none}
+.xchat{position:absolute;left:0;top:0;width:520px;height:560px;border:0;background:transparent;pointer-events:none;display:none}
 /* чат Twitch: без фона, слева под логотипом (лицо стримера по центру остаётся свободным) */
 .chat{position:absolute;left:56px;top:110px;width:430px;max-height:540px;display:flex;flex-direction:column;justify-content:flex-start;gap:4px;overflow:hidden;pointer-events:none}
 .cm{padding:1px 0;font-size:24px;font-weight:600;line-height:1.25;word-break:break-word;text-shadow:0 0 2px #000,0 0 5px #000,0 2px 8px rgba(0,0,0,.9);animation:cin .35s backwards;transition:opacity .6s}
@@ -121,9 +121,9 @@ addEventListener("resize",fit);fit();
 /* чат: ?chat=0 — скрыть; ?chatt=30 — сколько секунд живёт сообщение */
 const CHAT_URL="https://chat.eblo.id/chat/overlay/?channel=h_mst_r&font=2&shadow=1&nick_name=display&nick_cut=off&smooth=10&fade=20&max_lines=10&paint_shadows=false&plus_paint_shadows=false&chatterino_badges=true&ffz_badges=true&homies_badges=true&effects=false&link_urls=hide&gif_size=small&events=announcement%2Csub%2Cgift%2Craid%2Ccheer&collapse_spam=true&sv=3";
 /* ?chat=0 — без чата; ?chat=own — встроенный простой чат (через панель); иначе — внешний чат chat.eblo.id в рамке.
-   ?chan=имя — другой канал; ?chaturl=… — свой адрес чата целиком */
+   ?chath=560 — высота рамки чата, ?chaty=0 — сдвиг сверху в px (можно отрицательный); ?chan=имя — другой канал; ?chaturl=… — свой адрес чата целиком */
 const CM=P.get("chat"),XCHAT=CM!=="0"&&CM!=="own";
-if(XCHAT){try{const u=new URL(P.get("chaturl")||CHAT_URL);if(P.get("chan"))u.searchParams.set("channel",P.get("chan"));const f=$("xchat");f.src=u.href;f.style.display="block"}catch(e){}}
+if(XCHAT){try{const u=new URL(P.get("chaturl")||CHAT_URL);if(P.get("chan"))u.searchParams.set("channel",P.get("chan"));const f=$("xchat");f.src=u.href;f.style.display="block";const ch=parseInt(P.get("chath"),10),cy=parseInt(P.get("chaty"),10);if(ch)f.style.height=Math.max(200,Math.min(1080,ch))+"px";if(!isNaN(cy))f.style.top=cy+"px"}catch(e){}}
 const CHAT=CM==="own",CHT=Math.max(5,parseInt(P.get("chatt"),10)||30);
 if(!CHAT)$("chat").style.display="none";
 function addChat(d){
