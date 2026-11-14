@@ -431,7 +431,7 @@ const LBL=n=>n<=3?"Мимо":n<=5?"Нормально":n<=7?"Хорошо":n<=9?
 const col=n=>`hsl(${(n-1)*13} 85% 58%)`;
 $("rate").innerHTML=[1,2,3,4,5,6,7,8,9,10].map(n=>`<button data-r="${n}" style="color:${col(n)}">${n}</button>`).join("");
 let votes={},brk={on:false,until:0};
-const TAGS=[["🔥","хит"],["😢","грустный"],["💃","танцевальный"],["🤔","странный"],["💤","скучный"]],QP=["огонь","мимо","ещё раз","в плейлист!"];
+const TAGS=[["🔥","Качает"],["💤","Скучный"],["😄","Весёлый"],["👎","Не очень"],["⚖️","50/50"]],QP=["Добавлен в плейлист","Прикольный","Мимо"];
 function renderTags(){const c=S.current,on=t=>c&&(c.tags||[]).includes(t),d=c?"":" disabled";
   $("tags").innerHTML=`<div class="tgr"><span class="tgl">Настроение</span><div class="tgs">${TAGS.map(([e,t])=>`<button class="tg${on(t)?" on":""}" data-tag="${t}"${d}><i>${e}</i>${t}</button>`).join("")}</div></div><div class="tgr"><span class="tgl">Быстрый комментарий</span><div class="tgs">${QP.map(q=>`<button class="tg qp" data-qp="${q}"${d}>${q}</button>`).join("")}</div></div>`}
 function renderNow(resetNote){

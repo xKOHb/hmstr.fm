@@ -45,7 +45,7 @@ body.green{background:#00ff00}
 .card.nc .kick{font-size:12px;letter-spacing:2.5px}
 .card.nc .title{font-size:26px;margin:3px 0 2px;-webkit-line-clamp:1}
 .card.nc .by{font-size:16px}
-.card.nc .rating{width:84px;height:84px;font-size:42px;top:-52px;right:-6px}
+.card.nc .rating{width:84px;height:84px;font-size:42px;top:-70px;right:-6px}
 .kick{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:800;letter-spacing:3px;color:var(--ac2);text-transform:uppercase}
 .eq{display:flex;gap:3px;align-items:flex-end;height:18px}.eq i{width:4px;background:linear-gradient(var(--ac2),var(--ac));border-radius:2px;animation:eq .9s ease-in-out infinite alternate}
 .eq i:nth-child(2){animation-delay:-.3s}.eq i:nth-child(3){animation-delay:-.6s}.eq i:nth-child(4){animation-delay:-.15s}
@@ -130,6 +130,8 @@ body.green{background:#00ff00}
 .kick{justify-content:space-between}
 .title{display:block;overflow:visible;-webkit-line-clamp:unset}
 .card.nc .title{display:block;overflow:visible}
+.row2{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.row2 .by{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
 <body>
@@ -140,7 +142,7 @@ body.green{background:#00ff00}
 <div class="clip" id="clip"><div class="cimg" id="cimg"></div><div class="cvid" id="cvid"><div id="yt"></div></div></div>
 <div class="wrap"><div class="card" id="card">
   <div class="cover"><div class="disc"></div><div id="cv"></div></div>
-  <div class="txt"><div class="kick"><span>Сейчас играет</span><span class="vote" id="vt"></span></div><div class="title" id="ttl"></div><div class="by" id="by"></div><div class="pb"><i id="pbi"></i></div><div class="pt"><span id="pa"></span><span id="pd"></span></div></div>
+  <div class="txt"><div class="kick"><span>Сейчас играет</span></div><div class="title" id="ttl"></div><div class="row2"><div class="by" id="by"></div><span class="vote" id="vt"></span></div></div>
   <div class="rating" id="rt"></div>
 </div></div>
 <div class="queue" id="q"><h4>Далее в эфире</h4><div id="ql"></div></div>
@@ -285,12 +287,6 @@ function fitTitle(){const e=$("ttl");let fs=CLIP?26:36;e.style.fontSize=fs+"px";
 function flash(){const f=$("fl");f.classList.remove("go");void f.offsetWidth;f.classList.add("go")}
 function rain(){for(let i=0;i<26;i++){const d=document.createElement("i");d.className="ham";d.textContent=i%5?"🐹":"⭐";d.style.left=Math.random()*96+"%";d.style.animationDuration=(2.6+Math.random()*2.2)+"s";d.style.animationDelay=Math.random()*1.2+"s";STG.appendChild(d);setTimeout(()=>d.remove(),7000)}}
 function skull(){const d=document.createElement("div");d.className="skull";d.textContent="💀";STG.appendChild(d);setTimeout(()=>d.remove(),2600)}
-let fr=0;
-function loop(){requestAnimationFrame(loop);fr++;
-  const el=PG.dur?Math.min(PG.dur,PG.pos+(PG.play?(Date.now()-PG.t)/1000:0)):(PG.t0?(Date.now()-PG.t0)/1000:0);
-  $("pbi").style.width=PG.dur?(el/PG.dur*100)+"%":"100%";$("pbi").style.opacity=PG.dur?1:.25;
-  if(fr%10===0){$("pa").textContent=fmt(el);$("pd").textContent=PG.dur?fmt(PG.dur):"в эфире"}}
-requestAnimationFrame(loop);
 addEventListener("storage",upd);
 setInterval(upd,1000);upd();rJoin();
 </script>
