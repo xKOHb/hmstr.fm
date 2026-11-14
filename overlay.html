@@ -23,7 +23,7 @@ body.green{background:#00ff00}
 .logo{position:absolute;left:56px;top:40px;font-weight:900;font-size:34px;letter-spacing:1px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .logo b{background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
 .wrap{position:absolute;left:56px;bottom:56px}
-.card{position:relative;display:flex;align-items:center;padding:16px 30px 16px 16px;min-width:560px;max-width:920px;background:var(--card);border:2px solid color-mix(in srgb,var(--ac) 65%,transparent);border-radius:28px;box-shadow:0 0 44px -8px var(--ac),0 14px 40px rgba(0,0,0,.45);backdrop-filter:blur(10px);opacity:0;transform:translateX(-130%)}
+.card{position:relative;display:flex;align-items:center;padding:16px 30px 16px 16px;min-width:520px;max-width:780px;background:var(--card);border:2px solid color-mix(in srgb,var(--ac) 65%,transparent);border-radius:28px;box-shadow:0 0 44px -8px var(--ac),0 14px 40px rgba(0,0,0,.45);backdrop-filter:blur(10px);opacity:0;transform:translateX(-130%)}
 .card.in{animation:sin .9s cubic-bezier(.2,1.25,.4,1) forwards}
 .card.out{animation:sout .55s ease-in forwards}
 .card.in::before{content:"";position:absolute;inset:-2px;border-radius:28px;border:2px solid var(--ac2);opacity:0;animation:flash 1.2s .5s ease-out}
@@ -60,22 +60,21 @@ body.green{background:#00ff00}
 .q{font-size:20px;padding:5px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:qin .5s backwards}
 .q span{color:var(--ac);font-weight:800;margin-right:8px}
 @keyframes qin{from{opacity:0;transform:translateX(20px)}}
-/* чат Twitch */
-.chat{position:absolute;left:56px;bottom:270px;width:560px;max-height:300px;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;overflow:hidden;pointer-events:none}
-[data-cp=bl] .chat{bottom:auto;top:110px;justify-content:flex-start}
-.cm{background:var(--card);border:1px solid color-mix(in srgb,var(--ac) 35%,transparent);border-radius:16px;padding:8px 14px;font-size:22px;line-height:1.25;word-break:break-word;backdrop-filter:blur(8px);animation:cin .35s backwards;transition:opacity .6s}
-.cm b{margin-right:6px}
+/* чат Twitch: без фона, слева под логотипом (лицо стримера по центру остаётся свободным) */
+.chat{position:absolute;left:56px;top:110px;width:430px;max-height:540px;display:flex;flex-direction:column;justify-content:flex-start;gap:4px;overflow:hidden;pointer-events:none}
+.cm{padding:1px 0;font-size:24px;font-weight:600;line-height:1.25;word-break:break-word;text-shadow:0 0 2px #000,0 0 5px #000,0 2px 8px rgba(0,0,0,.9);animation:cin .35s backwards;transition:opacity .6s}
+.cm b{margin-right:6px;font-weight:800}
 .cm.old{opacity:0}
 @keyframes cin{from{opacity:0;transform:translateX(-20px)}}
 /* окно клипа / обложки */
-.clip{position:absolute;display:none;width:var(--cw,800px);aspect-ratio:16/9;border-radius:26px;border:3px solid color-mix(in srgb,var(--ac) 70%,transparent);background:#000;box-shadow:0 0 44px -8px var(--ac),0 14px 40px rgba(0,0,0,.5);overflow:hidden;opacity:0;transform:translateY(40px) scale(.96);transition:opacity .6s,transform .7s cubic-bezier(.2,1.2,.4,1);pointer-events:none}
+.clip{position:absolute;display:none;width:var(--cw,560px);aspect-ratio:16/9;border-radius:26px;border:3px solid color-mix(in srgb,var(--ac) 70%,transparent);background:#000;box-shadow:0 0 44px -8px var(--ac),0 14px 40px rgba(0,0,0,.5);overflow:hidden;opacity:0;transform:translateY(40px) scale(.96);transition:opacity .6s,transform .7s cubic-bezier(.2,1.2,.4,1);pointer-events:none}
 #st.hasclip .clip{display:block}
 .clip.show{opacity:1;transform:none}
 [data-cp=br] .clip{right:56px;bottom:56px}
 [data-cp=bl] .clip{left:56px;bottom:270px}
 [data-cp=tr] .clip{right:56px;top:250px}
 [data-cp=tl] .clip{left:56px;top:120px}
-[data-cp=c] .clip{left:50%;top:50%;margin-left:calc(var(--cw,800px) / -2);margin-top:calc(var(--cw,800px) * -9 / 32)}
+[data-cp=c] .clip{left:50%;top:50%;margin-left:calc(var(--cw,560px) / -2);margin-top:calc(var(--cw,560px) * -9 / 32)}
 [data-cp=c] .clip.show{transform:none}
 .cimg{position:absolute;inset:0}
 .cimg img{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -121,7 +120,7 @@ function addChat(d){
   const box=$("chat"),m=document.createElement("div"),b=document.createElement("b");
   m.className="cm";b.textContent=d.nick||"";b.style.color=/^#[0-9a-f]{6}$/i.test(d.color||"")?d.color:"var(--ac2)";
   m.appendChild(b);m.appendChild(document.createTextNode(String(d.text).slice(0,200)));box.appendChild(m);
-  while(box.children.length>7)box.firstChild.remove();
+  while(box.children.length>1&&box.scrollHeight>box.clientHeight+1)box.firstChild.remove();
   setTimeout(()=>{m.classList.add("old");setTimeout(()=>m.remove(),700)},CHT*1000);
 }
 const showQ=P.get("q")!=="0";
