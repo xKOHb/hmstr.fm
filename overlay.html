@@ -12,6 +12,9 @@
 [data-theme=sakura]{--ac:#ff7eb6;--ac2:#ffc2dd;--card:rgba(44,19,34,.88)}
 [data-theme=matrix]{--ac:#00ff7f;--ac2:#b6ff5e;--card:rgba(2,20,10,.9)}
 [data-theme=retro]{--ac:#ffb02e;--ac2:#ff6b3d;--card:rgba(50,29,10,.88)}
+[data-theme=volcano]{--ac:#ff3b3b;--ac2:#ff9a8a;--card:rgba(40,10,10,.88)}
+[data-theme=platinum]{--ac:#e4e8f0;--ac2:#b4bdd0;--card:rgba(20,22,30,.88)}
+[data-theme=stage]{--ac:#ffe11a;--ac2:#fff59a;--card:rgba(34,28,6,.9)}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:transparent;color:#fff;font-family:system-ui,"Segoe UI",Roboto,sans-serif}
 body.green{background:#00ff00}
@@ -26,6 +29,7 @@ body.green{background:#00ff00}
 @keyframes sout{from{transform:none;opacity:1}to{transform:translateX(-125%);opacity:0}}
 @keyframes flash{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(1.06)}}
 .cover{position:relative;width:150px;height:150px;flex:none}
+#cv{width:100%;height:100%}
 .cover img,.cover .ph{position:relative;z-index:2;width:100%;height:100%;object-fit:cover;border-radius:20px;display:block;box-shadow:0 8px 24px rgba(0,0,0,.5)}
 .ph{background:linear-gradient(135deg,var(--ac),var(--ac2));display:grid;place-items:center;font-size:60px}
 .disc{position:absolute;z-index:1;right:-48px;top:12px;width:126px;height:126px;border-radius:50%;background:radial-gradient(circle,var(--ac) 0 14%,#111 15% 17%,transparent 18%),repeating-radial-gradient(circle,#0b0b0b 0 3px,#1d1d1d 4px 5px);box-shadow:0 0 22px -4px var(--ac);animation:spin 3.5s linear infinite}
@@ -45,7 +49,7 @@ body.green{background:#00ff00}
 @keyframes ring{from{transform:scale(1);opacity:1}to{transform:scale(2.6);opacity:0}}
 .rating.hot{animation:stamp .65s cubic-bezier(.2,1.8,.4,1) forwards,pulse 1.2s .7s ease-in-out infinite alternate}
 @keyframes pulse{to{transform:scale(1.12) rotate(8deg)}}
-.queue{position:absolute;right:3vw;bottom:5vh;width:380px;background:var(--card);border:2px solid color-mix(in srgb,var(--ac) 40%,transparent);border-radius:22px;padding:14px 20px;backdrop-filter:blur(10px);opacity:0;transform:translateX(30px);transition:.5s}
+.queue{position:absolute;right:3vw;top:4vh;width:380px;background:var(--card);border:2px solid color-mix(in srgb,var(--ac) 40%,transparent);border-radius:22px;padding:14px 20px;backdrop-filter:blur(10px);opacity:0;transform:translateX(30px);transition:.5s}
 .queue.show{opacity:1;transform:none}
 .queue h4{margin:0 0 8px;font-size:13px;letter-spacing:2.5px;color:var(--ac2);text-transform:uppercase}
 .q{font-size:20px;padding:5px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:qin .5s backwards}
@@ -63,6 +67,7 @@ body.green{background:#00ff00}
   <div class="rating" id="rt"></div>
 </div></div>
 <div class="queue" id="q"><h4>Далее в эфире</h4><div id="ql"></div></div>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="sfx.js"></script>
 <script>
 const P=new URLSearchParams(location.search),$=id=>document.getElementById(id);
@@ -74,12 +79,14 @@ const rc=()=>{try{return JSON.parse(localStorage.getItem("hmstr_cfg"))||{}}catch
 const ytId=u=>((u||"").match(/(?:youtu\.be\/|[?&]v=|embed\/|shorts\/)([\w-]{11})/)||[])[1];
 const col=n=>`hsl(${(n-1)*13} 85% 58%)`;
 let last={id:null,rating:null,nk:null,q:"",th:null},hideT=null,ready=false;
-const snd=n=>{try{if(ready&&rc().snd==="overlay"&&window.SFX)SFX[n]()}catch(e){}};
+let CF={};
+const snd=n=>{try{if(ready&&CF.snd==="overlay"&&window.SFX)SFX[n]()}catch(e){}};
 function confetti(){const cs=["#ff8a3d","#ffd23f","#fff","#ff2bd6","#00e5ff","#3ddc84"];
   for(let i=0;i<46;i++){const d=document.createElement("i");d.className="conf";d.style.left=Math.random()*100+"%";d.style.background=cs[i%cs.length];d.style.animationDuration=(2.4+Math.random()*2)+"s";d.style.animationDelay=Math.random()*.6+"s";document.body.appendChild(d);setTimeout(()=>d.remove(),5500)}}
 function upd(){
-  const S=rd(),c=S.current,cf=rc();
-  document.documentElement.dataset.theme=localStorage.getItem("hmstr_theme")||"hamster";
+  const S=remote?{current:remote.current,queue:remote.queue}:rd(),c=S.current,cf=remote?{blind:remote.blind,snd:remote.snd}:rc();CF=cf;
+  if(remote&&typeof remote.sndVol==="number")window.SFX_VOL=remote.sndVol;
+  document.documentElement.dataset.theme=remote?remote.theme||"hamster":localStorage.getItem("hmstr_theme")||"hamster";
   const card=$("card"),id=c?c.id:null,r=c&&c.rating,hide=!!(cf.blind&&c&&!r);
   let name=c?(c.name||c.title||c.text||""):"";if(/^https?:/i.test(name)){try{name=new URL(name).hostname.replace(/^www\./,"")+" · трек по ссылке"}catch(e){}}
   if(id!==last.id){
@@ -103,8 +110,19 @@ function upd(){
   }
   last={id,rating:r||null,nk,q:qs,th};ready=true;
 }
+/* связь с панелью через WebRTC (PeerJS): ?room=КОД */
+const ROOM=P.get("room");let remote=null,rPeer=null,rConn=null,rT=null;
+const retry=ms=>{clearTimeout(rT);rT=setTimeout(rJoin,ms||3000)};
+function rJoin(){
+  if(!ROOM||!window.Peer||(rConn&&rConn.open))return;
+  if(!rPeer||rPeer.destroyed){try{rPeer=new Peer()}catch(e){return retry(5000)}rPeer.on("open",rJoin);rPeer.on("error",()=>retry(4000));rPeer.on("disconnected",()=>{try{rPeer.reconnect()}catch(e){}});return}
+  if(!rPeer.open)return;
+  try{rConn=rPeer.connect("hmstrfm-"+ROOM,{reliable:true})}catch(e){return retry()}
+  const c=rConn;c.on("data",d=>{remote=d;upd()});c.on("close",()=>retry());c.on("error",()=>retry());
+  setTimeout(()=>{if(!c.open){try{c.close()}catch(e){}retry(500)}},8000);
+}
 addEventListener("storage",upd);
-setInterval(upd,1000);upd();
+setInterval(upd,1000);upd();rJoin();
 </script>
 </body>
 </html>

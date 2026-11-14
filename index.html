@@ -159,6 +159,87 @@ input[type=checkbox]{width:20px;height:20px;accent-color:var(--ac)}
 .pend{border-color:#e5a000}
 #sc{display:block;width:100%;max-width:240px;height:auto;border-radius:14px;margin:12px auto}
 a.lnk{padding:7px 12px;border:1px solid var(--ln);border-radius:12px;color:var(--tx);text-decoration:none;background:var(--in);font-size:13px;white-space:nowrap}
+
+/* ===== v7: темы Вулкан / Платина / Сцена ===== */
+[data-theme=volcano]{--bg:#1a0707;--card:rgba(50,14,14,.72);--tx:#ffeceb;--mut:#d99a96;--ac:#ff3b3b;--ac2:#ff9a8a}
+[data-theme=platinum]{--bg:#0b0c10;--card:rgba(26,28,36,.7);--tx:#f1f3f8;--mut:#9aa3b5;--ac:#e4e8f0;--ac2:#b4bdd0}
+[data-theme=stage]{--bg:#100d04;--card:rgba(42,35,8,.72);--tx:#fffbe0;--mut:#cbbf7a;--ac:#ffe11a;--ac2:#fff59a}
+/* вулкан: тлеющие искры вверх + пульсирующая лава */
+[data-theme=volcano] .bg{background:radial-gradient(900px 420px at 50% 112%,rgba(255,59,59,.5),transparent 70%),radial-gradient(500px at 100% 0,rgba(255,120,90,.1),transparent),var(--bg)}
+[data-theme=volcano] .bg::before{background-image:radial-gradient(circle,rgba(255,150,100,.95) 2px,transparent 3px),radial-gradient(circle,rgba(255,80,60,.85) 1.5px,transparent 2.5px),radial-gradient(circle,rgba(255,215,175,.8) 1px,transparent 2px);background-size:140px 190px,90px 130px,210px 260px;background-position:0 0,40px 60px,90px 20px;animation:ember 14s linear infinite;-webkit-mask-image:linear-gradient(to top,#000 5%,transparent 95%);mask-image:linear-gradient(to top,#000 5%,transparent 95%)}
+[data-theme=volcano] .bg::after{background:radial-gradient(700px 300px at 50% 118%,rgba(255,90,40,.5),transparent 70%);animation:lava 4s ease-in-out infinite alternate}
+@keyframes ember{to{background-position:0 -190px,40px -70px,90px -240px}}
+@keyframes lava{from{opacity:.5;transform:scale(1)}to{opacity:1;transform:scale(1.12) translateY(-12px)}}
+/* платина: скользящий блик + медленная пыль */
+[data-theme=platinum] .bg{background:radial-gradient(800px at 12% 0,rgba(228,232,240,.12),transparent),radial-gradient(700px at 100% 100%,rgba(160,175,200,.11),transparent),var(--bg)}
+[data-theme=platinum] .bg::before{inset:-50%;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.09) 45%,rgba(255,255,255,.26) 50%,rgba(255,255,255,.09) 55%,transparent 60%);animation:sheen 9s ease-in-out infinite alternate}
+[data-theme=platinum] .bg::after{background-image:radial-gradient(circle,rgba(255,255,255,.55) 1px,transparent 2px),radial-gradient(circle,rgba(200,210,230,.4) 1.5px,transparent 2.5px);background-size:120px 120px,180px 180px;background-position:0 0,60px 90px;animation:dust 40s linear infinite}
+@keyframes sheen{from{transform:translateX(-30%)}to{transform:translateX(30%)}}
+@keyframes dust{to{background-position:120px 120px,240px 270px}}
+/* сцена: два качающихся прожектора */
+[data-theme=stage] .bg{background:radial-gradient(900px 500px at 50% -10%,rgba(255,225,26,.16),transparent 70%),linear-gradient(#100d04,#070602)}
+[data-theme=stage] .bg::before,[data-theme=stage] .bg::after{-webkit-mask-image:linear-gradient(#000 25%,transparent 100%);mask-image:linear-gradient(#000 25%,transparent 100%)}
+[data-theme=stage] .bg::before{background:conic-gradient(from 148deg at 25% 0,transparent 0,rgba(255,225,26,.5) 20deg,transparent 40deg,transparent 360deg);transform-origin:25% 0;animation:beamL 7s ease-in-out infinite alternate,flick 3.2s ease-in-out infinite}
+[data-theme=stage] .bg::after{background:conic-gradient(from 148deg at 75% 0,transparent 0,rgba(255,245,154,.45) 20deg,transparent 40deg,transparent 360deg);transform-origin:75% 0;animation:beamR 9s ease-in-out infinite alternate,flick 4.1s ease-in-out infinite}
+@keyframes beamL{from{transform:rotate(-24deg)}to{transform:rotate(26deg)}}
+@keyframes beamR{from{transform:rotate(28deg)}to{transform:rotate(-22deg)}}
+@keyframes flick{0%,100%{opacity:.7}50%{opacity:1}}
+
+/* ===== настройки: компактнее и спокойнее ===== */
+.sheet{line-height:1.3;padding:20px}
+.sheet h3{margin:16px 0 6px;padding-top:12px;border-top:1px solid var(--ln);font-size:11.5px;letter-spacing:1.4px;color:var(--ac2);opacity:.9}
+.sheet h3:first-of-type{border-top:0;padding-top:0;margin-top:8px}
+.fld{margin:5px 0;gap:8px}
+.fld>label{min-width:150px;font-size:14px;line-height:1.25;color:color-mix(in srgb,var(--tx) 85%,var(--mut))}
+.fld small{display:block;font-size:12px;color:var(--mut);margin-top:1px}
+.hint{font-size:12px;line-height:1.35;margin-top:6px}
+.tgrid{margin-bottom:12px}
+.fld input[type=text],.fld input[type=number],.fld select{padding:8px 11px}
+.sheet .row{margin:6px 0}
+
+/* ===== интерфейс: плеер, кнопки, анимации ===== */
+button{position:relative;overflow:hidden}
+button::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.26) 50%,transparent 70%);transform:translateX(-120%);transition:transform .6s;pointer-events:none}
+button:hover:not(:disabled)::after{transform:translateX(120%)}
+button:hover:not(:disabled){transform:translateY(-2px);border-color:color-mix(in srgb,var(--ac) 55%,transparent);box-shadow:0 6px 20px -8px var(--ac)}
+button.p:hover:not(:disabled){box-shadow:0 8px 26px -6px var(--ac)}
+button:focus-visible,a.lnk:focus-visible{outline:2px solid var(--ac2);outline-offset:2px}
+#gear{transition:transform .5s cubic-bezier(.3,1.5,.5,1),background .2s}#gear:hover:not(:disabled){transform:rotate(120deg) scale(1.1)}
+.logo:hover .eq i{animation-duration:.35s}
+.card{animation:in .5s backwards;transition:border-color .3s,box-shadow .3s}
+.col .card:nth-child(2){animation-delay:.07s}.col .card:nth-child(3){animation-delay:.14s}.col .card:nth-child(4){animation-delay:.21s}
+.card:hover{border-color:color-mix(in srgb,var(--ac) 32%,var(--ln))}
+.item{transition:background .2s,padding .2s;border-radius:10px}
+.item:hover{background:color-mix(in srgb,var(--ac) 8%,transparent);padding-left:8px;padding-right:8px}
+#queue{counter-reset:q}
+#queue .item::before{counter-increment:q;content:counter(q);flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--ac) 24%,transparent);color:var(--ac2);font-size:12px;font-weight:800}
+#queue .item>div:first-child{flex:1}
+.item .row button{padding:6px 10px}
+.rate button:hover:not(:disabled){transform:translateY(-3px) scale(1.1);box-shadow:0 8px 20px -6px currentColor}
+.rate button.sel:hover:not(:disabled){transform:scale(1.2)}
+.tc{transition:transform .25s cubic-bezier(.3,1.4,.5,1),box-shadow .25s}.tc:hover{transform:translateY(-3px) scale(1.04)}.tc .pv{transition:filter .3s}.tc:hover .pv{filter:brightness(1.25) saturate(1.2)}
+/* плеер */
+.prog{height:6px;border-radius:99px;background:var(--in);margin:12px 0 0;cursor:pointer;position:relative;overflow:hidden;transition:height .2s}
+.prog:hover{height:10px}
+.prog i{position:absolute;inset:0 auto 0 0;width:0;border-radius:99px;background:linear-gradient(90deg,var(--ac),var(--ac2));box-shadow:0 0 12px var(--ac);transition:width .5s linear}
+.info{display:flex;gap:14px;align-items:center}
+.info>div{min-width:0}
+.disc{flex:none;width:58px;height:58px;border-radius:50%;background:radial-gradient(circle,var(--ac) 0 14%,#111 15% 17%,transparent 18%),repeating-radial-gradient(circle,#0b0b0b 0 2px,#1c1c1c 3px 4px),#111;box-shadow:0 0 18px -4px var(--ac);animation:spin 3s linear infinite;animation-play-state:paused}
+body.live .disc{animation-play-state:running}
+body.live .stage{box-shadow:0 0 0 1px color-mix(in srgb,var(--ac) 45%,transparent),0 0 40px -10px var(--ac)}
+body.live .ambient{animation:amb 4s ease-in-out infinite alternate}
+@keyframes amb{from{opacity:.4}to{opacity:.72}}
+#pp{width:46px;height:46px;border-radius:50%;padding:0;font-size:18px;border:0;color:#1a1008;background:linear-gradient(135deg,var(--ac),var(--ac2));box-shadow:0 4px 18px -4px var(--ac)}
+#pp:hover:not(:disabled){transform:scale(1.1)}
+#mute{width:40px;height:40px;border-radius:50%;padding:0}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;height:20px}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:99px;background:var(--in)}
+input[type=range]::-moz-range-track{height:6px;border-radius:99px;background:var(--in)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-5px;border-radius:50%;background:var(--ac2);box-shadow:0 0 10px var(--ac);transition:transform .15s}
+input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.3)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:var(--ac2);box-shadow:0 0 10px var(--ac)}
+#nx.ping{animation:ping 2s ease-in-out infinite}
+@keyframes ping{0%,100%{box-shadow:0 4px 18px -4px var(--ac)}50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--ac) 25%,transparent),0 4px 22px -2px var(--ac)}}
 </style>
 </head>
 <body>
@@ -172,7 +253,8 @@ a.lnk{padding:7px 12px;border:1px solid var(--ln);border-radius:12px;color:var(-
   <section class="col">
     <div class="card">
       <div class="stagewrap" id="sw"><div class="ambient" id="amb"></div><div class="stage" id="stage"></div></div>
-      <div class="info"><span class="chip" id="src"></span><h1 id="ttl"></h1><div class="m" id="sub"></div></div>
+      <div class="prog" id="prog" title="Перемотка (YouTube)"><i id="pg"></i></div>
+      <div class="info"><div class="disc" aria-hidden="true"></div><div><span class="chip" id="src"></span><h1 id="ttl"></h1><div class="m" id="sub"></div></div></div>
       <div class="ctrl">
         <button id="pp" title="Пауза / играть (пробел)">⏯</button>
         <button id="mute" title="Без звука (M)">🔊</button>
@@ -203,29 +285,31 @@ a.lnk{padding:7px 12px;border:1px solid var(--ln);border-radius:12px;color:var(-
   <div class="shh">Настройки <button id="mclose" class="ghost">✕</button></div>
   <h3>Тема</h3><div class="tgrid" id="tgrid"></div>
   <div class="fld"><label for="c-fxbg">Анимированный фон</label><input type="checkbox" id="c-fxbg"></div>
-  <div class="fld"><label for="c-fxb">Эффекты при оценке 9–10</label><input type="checkbox" id="c-fxb"></div>
-  <h3>Чат Twitch (бот)</h3>
+  <div class="fld"><label for="c-fxb">Эффекты на оценки 9–10</label><input type="checkbox" id="c-fxb"></div>
+  <h3>Эфир</h3>
+  <div class="fld"><label for="c-blind">Слепое прослушивание<small>ник скрыт до оценки · клавиша B</small></label><input type="checkbox" id="c-blind"></div>
+  <div class="fld"><label for="c-snd">Звуки<small>джингл, аплодисменты на 9, эйрхорн на 10</small></label><select id="c-snd"><option value="panel">В панели</option><option value="overlay">В оверлее (OBS)</option><option value="off">Выкл</option></select></div>
+  <div class="fld"><label for="c-sndv">Громкость звуков</label><input type="range" id="c-sndv" min="0" max="100" step="5"></div>
+  <div class="row"><button id="t-j">▶ Джингл</button><button id="t-a">▶ Аплодисменты</button><button id="t-h">▶ Эйрхорн</button></div>
+  <h3>Чат Twitch</h3>
   <div class="fld"><label for="c-bot">Принимать заявки из чата</label><input type="checkbox" id="c-bot"></div>
   <div class="fld"><label for="c-chan">Канал</label><input type="text" id="c-chan" placeholder="например, hmstr"></div>
-  <div class="fld"><label for="c-cmds">Команды (через запятую)</label><input type="text" id="c-cmds"></div>
-  <div class="fld"><label for="c-maxq">Макс. заявок от одного зрителя в очереди</label><input type="number" id="c-maxq" min="1" max="20"></div>
+  <div class="fld"><label for="c-cmds">Команды</label><input type="text" id="c-cmds"></div>
+  <div class="fld"><label for="c-maxq">Заявок от зрителя в очереди</label><input type="number" id="c-maxq" min="1" max="20"></div>
   <div class="fld"><label for="c-cd">Пауза между заявками, сек</label><input type="number" id="c-cd" min="0" max="600"></div>
-  <div class="hint"><span class="dot" id="tw-dot"></span><span id="tw-st">выключено</span>. Бот читает чат без входа в аккаунт. Зритель пишет, например: <b>!заказ Artist - Song</b> или <b>!заказ https://youtu.be/…</b>. Отвечать в чат бот пока не умеет.</div>
+  <div class="hint"><span class="dot" id="tw-dot"></span><span id="tw-st">выключено</span> · читает чат анонимно, отвечать не умеет. Пример: <b>!заказ Artist - Song</b></div>
+  <div class="hint" id="tw-last"></div>
+  <h3>Фильтры</h3>
+  <div class="fld"><label for="c-bann">Чёрный список ников</label><input type="text" id="c-bann" placeholder="через запятую"></div>
+  <div class="fld"><label for="c-banw">Запрещённые слова</label><input type="text" id="c-banw" placeholder="через запятую"></div>
+  <div class="fld"><label for="c-conf">Проверять подозрительные заявки<small>чужой сайт, несколько ссылок, длинный текст</small></label><input type="checkbox" id="c-conf"></div>
   <h3>OBS-оверлей</h3>
-  <div class="fld"><label for="c-ovq">Показывать «Далее в эфире»</label><input type="checkbox" id="c-ovq"></div>
+  <div class="fld"><label for="c-ovq">«Далее в эфире» в оверлее</label><input type="checkbox" id="c-ovq"></div>
   <div class="row"><button id="ov-copy">📋 Ссылка для Browser Source</button><button id="ov-win">🪟 Окно с зелёным фоном</button></div>
-  <div class="hint" style="margin-top:8px">Лучший вариант: в OBS добавь панель <b>Docks → Custom Browser Docks</b> с адресом этого сайта, а оверлей добавь как <b>Browser Source</b> по ссылке выше. Они делят данные внутри OBS. Запасной: «Окно с зелёным фоном» + Window Capture + фильтр Chroma Key.</div>
-  <h3>Эфир</h3>
-  <div class="fld"><label for="c-blind">Слепое прослушивание: ник скрыт, пока нет оценки (клавиша B)</label><input type="checkbox" id="c-blind"></div>
-  <div class="fld"><label for="c-snd">Звуки: джингл на смену трека, аплодисменты на 9, эйрхорн на 10</label><select id="c-snd"><option value="panel">Играть в панели</option><option value="overlay">Играть в оверлее (OBS)</option><option value="off">Выключены</option></select></div>
-  <div class="row"><button id="t-j">▶ Джингл</button><button id="t-a">▶ Аплодисменты</button><button id="t-h">▶ Эйрхорн</button></div>
-  <h3>Фильтры чата</h3>
-  <div class="fld"><label for="c-bann">Чёрный список ников (через запятую)</label><input type="text" id="c-bann"></div>
-  <div class="fld"><label for="c-banw">Запрещённые слова (через запятую)</label><input type="text" id="c-banw"></div>
-  <div class="fld"><label for="c-conf">Подозрительные заявки (неизвестный сайт, несколько ссылок, длинный текст) отправлять на проверку</label><input type="checkbox" id="c-conf"></div>
+  <div class="hint"><span class="dot" id="ov-dot"></span><span id="ov-st">…</span> · В OBS: Sources → + → Browser, вставь ссылку, размер 1920×1080. Панель должна быть открыта.</div>
   <h3>Плейлист</h3>
-  <div class="fld"><label for="c-clean">Чистить названия («Official Video», «Lyrics» и т. п.)</label><input type="checkbox" id="c-clean"></div>
-  <div class="fld"><label for="c-copy">Копировать</label><select id="c-copy"><option value="names">Исполнитель – Название</option><option value="links">Ссылки</option></select></div>
+  <div class="fld"><label for="c-clean">Чистить названия<small>убирает Official Video, Lyrics и т. п.</small></label><input type="checkbox" id="c-clean"></div>
+  <div class="fld"><label for="c-copy">Копировать как</label><select id="c-copy"><option value="names">Исполнитель – Название</option><option value="links">Ссылки</option></select></div>
   <h3>Данные</h3>
   <div class="row"><button id="d-exp">⬇ Экспорт</button><button id="d-imp">⬆ Импорт</button><button id="clr">🗑 Новый эфир</button><input type="file" id="d-file" accept="application/json" hidden></div>
 </div></div>
@@ -237,25 +321,27 @@ a.lnk{padding:7px 12px;border:1px solid var(--ln);border-radius:12px;color:var(-
   <h3>Экспорт плейлиста</h3>
   <div id="xbody"></div>
   <div class="row" style="margin-top:10px"><button id="x-copy">📋 Скопировать список</button><button id="x-csv">⬇ CSV для переноса</button></div>
-  <div class="hint" style="margin-top:8px">Яндекс Музыка не даёт сторонним сайтам добавлять треки без своей авторизации, поэтому «в один клик» не выйдет. Рабочий путь: кнопка «Яндекс» открывает поиск этого трека (там жмёшь ♡), либо скачай CSV и загрузи в сервис переноса плейлистов (TuneMyMusic, Soundiiz и подобные: проверь, что в нём есть Яндекс Музыка). Кнопка Spotify работает так же.</div>
+  <div class="hint">Яндекс Музыка не даёт сторонним сайтам добавлять треки без своей авторизации. «Яндекс» и «Spotify» открывают поиск трека, а CSV можно загрузить в сервис переноса плейлистов.</div>
 </div></div>
 <div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="sfx.js"></script>
 <script>
 const KEY="hmstr_fm_v1",$=id=>document.getElementById(id);
 let S={queue:[],current:null,history:[]};
+let peer=null,conns=[],peerT=null,peerErr="",twT=null;
 const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
 function fixS(o){o=o&&typeof o==="object"?o:{};const r={queue:[],current:null,history:[],pending:[],...o},ok=x=>x&&typeof x.text==="string";
   r.queue=Array.isArray(r.queue)?r.queue.filter(ok):[];r.pending=Array.isArray(r.pending)?r.pending.filter(ok):[];r.history=Array.isArray(r.history)?r.history.filter(x=>x&&typeof x==="object"):[];if(!ok(r.current))r.current=null;return r}
 try{S=fixS(JSON.parse(ls.get(KEY)))}catch(e){S=fixS()}
-const save=()=>ls.set(KEY,JSON.stringify(S));
+const save=()=>{ls.set(KEY,JSON.stringify(S));bcast()};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const isUrl=s=>/^https?:\/\//i.test(s);
 let vol=ls.get("hmstr_vol")!==null?+ls.get("hmstr_vol"):50,muted=false,player=null,ytReady=false,pending=null,playing=false;
 const ytId=u=>((u||"").match(/(?:youtu\.be\/|[?&]v=|embed\/|shorts\/)([\w-]{11})/)||[])[1];
-const THEMES=[["hamster","Хомяк","linear-gradient(135deg,#17120f,#ff8a3d)"],["neon","Неон","linear-gradient(135deg,#2a0a5e,#ff2bd6 55%,#00e5ff)"],["space","Космос","linear-gradient(135deg,#050816,#7c9cff,#c39bff)"],["lagoon","Лагуна","linear-gradient(135deg,#06201f,#2fe3b0,#6ad6ff)"],["sakura","Сакура","linear-gradient(135deg,#1d0f18,#ff7eb6,#ffc2dd)"],["matrix","Матрица","linear-gradient(135deg,#020a05,#00ff7f)"],["retro","Ретро","linear-gradient(135deg,#241407,#ffb02e,#ff6b3d)"]];
+const THEMES=[["hamster","Хомяк","linear-gradient(135deg,#17120f,#ff8a3d)"],["neon","Неон","linear-gradient(135deg,#2a0a5e,#ff2bd6 55%,#00e5ff)"],["space","Космос","linear-gradient(135deg,#050816,#7c9cff,#c39bff)"],["lagoon","Лагуна","linear-gradient(135deg,#06201f,#2fe3b0,#6ad6ff)"],["sakura","Сакура","linear-gradient(135deg,#1d0f18,#ff7eb6,#ffc2dd)"],["matrix","Матрица","linear-gradient(135deg,#020a05,#00ff7f)"],["retro","Ретро","linear-gradient(135deg,#241407,#ffb02e,#ff6b3d)"],["volcano","Вулкан","linear-gradient(135deg,#1a0707,#ff3b3b 60%,#ff9a8a)"],["platinum","Платина","linear-gradient(135deg,#0b0c10,#e4e8f0 70%,#8a94a8)"],["stage","Сцена","linear-gradient(135deg,#100d04,#ffe11a 60%,#fff59a)"]];
 let theme=ls.get("hmstr_theme")||"hamster";
-function setTheme(t){theme=t;document.documentElement.dataset.theme=t;ls.set("hmstr_theme",t);document.querySelectorAll(".tc").forEach(b=>b.classList.toggle("on",b.dataset.t===t))}
+function setTheme(t){theme=t;document.documentElement.dataset.theme=t;ls.set("hmstr_theme",t);bcast();document.querySelectorAll(".tc").forEach(b=>b.classList.toggle("on",b.dataset.t===t))}
 function toast(t){const o=$("toast");o.textContent=t;o.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>o.classList.remove("show"),1600)}
 /* helpers: дубли, фильтры, звук, слепой режим */
 function normKey(t){t=String(t||"").trim();const y=ytId(t);if(y)return"yt:"+y;const m=t.match(/open\.spotify\.com\/(?:intl-\w+\/)?(track|album|playlist|episode)\/(\w+)/);if(m)return"sp:"+m[2];
@@ -275,7 +361,7 @@ function mountYT(id){
     onReady:e=>{applyVol();e.target.playVideo();grab()},
     onStateChange:e=>{playing=e.data===1;$("pp").textContent=playing?"⏸":"▶";grab();setLive()}}});
 }
-function grab(){try{const d=player.getVideoData();if(d&&d.title&&S.current&&!S.current.title){S.current.title=d.title;S.current.author=d.author;S.current.name=plName(S.current);save();renderNow(false);renderLists()}}catch(e){}}
+function grab(){try{const d=player.getVideoData(),c=S.current;if(!d||!c||!d.title)return;if(!c.title||(!c.author&&d.author)){c.title=c.title||d.title;c.author=c.author||d.author||"";c.name=plName(c);save();renderNow(false);renderLists()}}catch(e){}}
 function applyVol(){
   $("vol").value=vol;$("vl").textContent=muted?"mute":vol+"%";$("mute").textContent=muted||vol==0?"🔇":vol<40?"🔉":"🔊";
   if(player&&player.setVolume){try{player.setVolume(vol);muted?player.mute():player.unMute()}catch(e){}}
@@ -315,7 +401,7 @@ function renderNow(resetNote){
 function renderLists(){
   $("pcard").hidden=!S.pending.length;$("pc").textContent=S.pending.length||"";
   $("pend").innerHTML=S.pending.map(x=>`<div class="item"><div style="min-width:0"><div class="t">${esc(x.text)}</div><div class="m">${cfg.blind?"???":"@"+esc(x.nick)}</div></div><div class="row" style="flex-wrap:nowrap"><button data-ok="${x.id}" title="Принять">✓</button><button data-no="${x.id}" title="Отклонить">✕</button><button data-ban="${x.id}" title="В чёрный список">🚫</button></div></div>`).join("");
-  const q=S.queue;$("qc").textContent=q.length?q.length:"";
+  const q=S.queue;$("qc").textContent=q.length?q.length:"";$("nx").classList.toggle("ping",!!q.length&&!S.current);
   $("queue").innerHTML=q.length?q.map(x=>`<div class="item"><div style="min-width:0"><div class="t">${esc(x.text)}</div><div class="m">${cfg.blind?"@???":"@"+esc(x.nick)}${x.comment?" · "+esc(x.comment):""}</div></div><div class="row" style="flex-wrap:nowrap"><button data-go="${x.id}" title="Играть сейчас">▶</button><button data-d="${x.id}" title="Удалить">✕</button><button data-ban="${x.id}" title="В чёрный список">🚫</button></div></div>`).join(""):'<div class="empty">Очередь пуста — добавь заявку из чата.</div>';
   $("hist").innerHTML=S.history.length?S.history.map(h=>`<div class="item"><div style="min-width:0"><div class="t">${esc(plName(h))}</div><div class="m">@${esc(h.nick)}${h.note?" · "+esc(h.note):""}${h.pl?" · ♥":""}${h.skipped?" · пропущен":""}</div></div><div class="sc" style="color:${h.rating?col(h.rating):"var(--mut)"}">${h.rating??"–"}</div></div>`).join(""):'<div class="empty">Пока пусто.</div>';
   const all=[S.current,...S.history].filter(x=>x),r=all.filter(x=>x.rating);
@@ -361,9 +447,11 @@ $("exp").onclick=async()=>{const all=[S.current,...S.history].filter(x=>x&&x.pl)
 $("clr").onclick=()=>{if(confirm("Очистить очередь и историю?")){S=fixS();save();show()}};
 
 const CFGK="hmstr_cfg";
-let cfg={chan:"",bot:false,cmds:"!заказ,!sr,!order",maxq:2,cd:30,clean:true,copy:"names",fxBg:true,fxBurst:true,ovq:true,snd:"panel",blind:false,banNicks:"",banWords:"",conf:true};
+let cfg={chan:"",bot:false,cmds:"!заказ,!sr,!order",maxq:2,cd:30,clean:true,copy:"names",fxBg:true,fxBurst:true,ovq:true,snd:"panel",blind:false,banNicks:"",banWords:"",conf:true,sndVol:25,room:""};
 try{Object.assign(cfg,JSON.parse(ls.get(CFGK)||"{}"))}catch(e){}
 const cfgSave=()=>ls.set(CFGK,JSON.stringify(cfg));
+function chanName(v){v=String(v||"").trim().toLowerCase();const m=v.match(/twitch\.tv\/(?:popout\/)?([a-z0-9_]+)/);if(m)v=m[1];return v.replace(/^[#@]/,"").replace(/[^a-z0-9_]/g,"")}
+cfg.chan=chanName(cfg.chan);if(!cfg.room){cfg.room=Math.random().toString(36).slice(2,12);cfgSave()}
 function applyCfg(){document.documentElement.dataset.fx=cfg.fxBg?"on":"off";$("bl").style.display=cfg.blind?"":"none"}
 /* clean names for playlist */
 function cleanTitle(t){
@@ -375,9 +463,10 @@ function cleanTitle(t){
 function plName(x){
   if(!x)return"";
   if(!x.title)return isUrl(x.text)?x.text:cleanTitle(x.text);
-  const t=cleanTitle(x.title),a=(x.author||"").replace(/\s*-\s*Topic$/i,"").replace(/VEVO$/i,"").replace(/\s*(Official|Music|Records)$/i,"").trim();
+  const t=cleanTitle(x.title),a=(x.author||"").replace(/\s*[-–—]\s*(Topic|Тема)$/i,"").replace(/VEVO$/i,"").replace(/\s*(Official|Music|Records)$/i,"").trim();
   if(/\s[-–—]\s/.test(t))return t.replace(/\s[-–—]\s/," – ");
-  return a?a+" – "+t:t;
+  if(a&&!t.toLowerCase().includes(a.toLowerCase()))return a+" – "+t;
+  return t;
 }
 const plOut=x=>cfg.copy==="links"?x.text:plName(x);
 function setLive(){const c=S.current;document.body.classList.toggle("live",!!c&&(playing||!ytId(c.text)));$("air").classList.toggle("on",!!c)}
@@ -385,29 +474,33 @@ function setLive(){const c=S.current;document.body.classList.toggle("live",!!c&&
 let ws=null,wsT=null;const lastReq={};
 function twSt(t,ok){$("tw-st").textContent=t;$("tw-dot").className="dot"+(ok?" ok":"")}
 function twConnect(){
-  clearTimeout(wsT);if(ws){ws.onclose=null;try{ws.close()}catch(e){}ws=null}
-  const ch=cfg.chan.trim().toLowerCase().replace(/^#/,"");
+  clearTimeout(wsT);clearTimeout(twT);if(ws){ws.onclose=null;try{ws.close()}catch(e){}ws=null}
+  const ch=chanName(cfg.chan);
   if(!cfg.bot||!ch){twSt(cfg.bot?"укажи канал":"выключено",false);return}
-  twSt("подключаюсь…",false);
-  ws=new WebSocket("wss://irc-ws.chat.twitch.tv:443");
-  ws.onopen=()=>{ws.send("CAP REQ :twitch.tv/tags");ws.send("NICK justinfan"+(10000+Math.floor(Math.random()*89999)));ws.send("JOIN #"+ch)};
+  twSt("подключаюсь к #"+ch+"…",false);
+  twT=setTimeout(()=>twSt("нет ответа от Twitch, проверь название канала",false),10000);
+  try{ws=new WebSocket("wss://irc-ws.chat.twitch.tv:443")}catch(e){twSt("браузер не даёт открыть соединение",false);return}
+  ws.onopen=()=>{ws.send("CAP REQ :twitch.tv/tags");ws.send("PASS SCHMOOPIIE");ws.send("NICK justinfan"+(10000+Math.floor(Math.random()*89999)));ws.send("JOIN #"+ch)};
   ws.onmessage=ev=>String(ev.data).split(/\r?\n/).forEach(l=>{
     if(!l)return;if(l.startsWith("PING")){ws.send("PONG :tmi.twitch.tv");return}
-    if(/ 366 /.test(l)){twSt("слушаю чат #"+ch,true);return}
+    if(/ 366 /.test(l)){clearTimeout(twT);twSt("слушаю чат #"+ch,true);return}
     const m=l.match(/^(?:@(\S+) )?:(\w+)!\w+@\S+ PRIVMSG #\w+ :(.*)$/);if(m)onChat(m[1],m[2],m[3]);
   });
+  ws.onerror=()=>twSt("ошибка соединения",false);
   ws.onclose=()=>{if(cfg.bot){twSt("переподключение…",false);wsT=setTimeout(twConnect,4000)}};
 }
 function onChat(tags,login,msg){
+  msg=msg.replace(/[\u200b-\u200f\u2060\ufeff\u034f\u{E0000}-\u{E007F}]/gu,"");
   const t={};(tags||"").split(";").forEach(p=>{const i=p.indexOf("=");if(i>0)t[p.slice(0,i)]=p.slice(i+1)});
   const nick=t["display-name"]||login,cmds=cfg.cmds.split(",").map(x=>x.trim().toLowerCase()).filter(Boolean);
+  const lt=$("tw-last");if(lt)lt.textContent="Последнее в чате: "+(cfg.blind?"":nick+": ")+msg.slice(0,50);
   const sp=msg.trim().split(/\s+/),text=sp.slice(1).join(" ").trim().slice(0,300);
   if(!cmds.includes(sp[0].toLowerCase())||!text)return;
   const bn=lst(cfg.banNicks);if(bn.includes(login.toLowerCase())||bn.includes(nick.toLowerCase()))return;
   if(lst(cfg.banWords).some(w=>text.toLowerCase().includes(w)))return;
-  if(isDup(text))return;
+  if(isDup(text))return toast("Этот трек уже в очереди или играет");
   if([...S.queue,...S.pending].filter(q=>q.nick===nick).length>=cfg.maxq)return cfg.blind||toast("@"+nick+": лимит заявок в очереди");
-  if(Date.now()-(lastReq[nick]||0)<cfg.cd*1000)return;
+  const left=cfg.cd-(Date.now()-(lastReq[nick]||0))/1000;if(left>0)return cfg.blind||toast("@"+nick+": подожди "+Math.ceil(left)+" с");
   lastReq[nick]=Date.now();
   const it={id:Date.now()+Math.random(),text,nick,comment:"",src:"twitch"};
   if(cfg.conf&&suspicious(text)){S.pending.push(it);save();renderLists();toast(cfg.blind?"⚠ заявка на проверке":"⚠ @"+nick+": на проверке");return}
@@ -416,29 +509,37 @@ function onChat(tags,login,msg){
 /* settings UI */
 $("tgrid").innerHTML=THEMES.map(([k,n,g])=>`<button class="tc" data-t="${k}"><div class="pv" style="background:${g}"></div><span>${n}</span></button>`).join("");
 $("tgrid").onclick=e=>{const b=e.target.closest(".tc");if(b)setTheme(b.dataset.t)};
-[["c-chan","chan","s"],["c-bot","bot","b"],["c-cmds","cmds","s"],["c-maxq","maxq","n"],["c-cd","cd","n"],["c-clean","clean","b"],["c-copy","copy","s"],["c-fxbg","fxBg","b"],["c-fxb","fxBurst","b"],["c-ovq","ovq","b"],["c-snd","snd","s"],["c-blind","blind","b"],["c-bann","banNicks","s"],["c-banw","banWords","s"],["c-conf","conf","b"]].forEach(([id,k,ty])=>{
+[["c-chan","chan","s"],["c-bot","bot","b"],["c-cmds","cmds","s"],["c-maxq","maxq","n"],["c-cd","cd","n"],["c-clean","clean","b"],["c-copy","copy","s"],["c-fxbg","fxBg","b"],["c-fxb","fxBurst","b"],["c-ovq","ovq","b"],["c-sndv","sndVol","n"],["c-snd","snd","s"],["c-blind","blind","b"],["c-bann","banNicks","s"],["c-banw","banWords","s"],["c-conf","conf","b"]].forEach(([id,k,ty])=>{
   const el=$(id);if(ty==="b")el.checked=!!cfg[k];else el.value=cfg[k];
-  el.onchange=()=>{cfg[k]=ty==="b"?el.checked:ty==="n"?+el.value:el.value.trim();cfgSave();applyCfg();
+  el.onchange=()=>{cfg[k]=ty==="b"?el.checked:ty==="n"?+el.value:el.value.trim();if(k==="chan"){cfg.chan=chanName(el.value);el.value=cfg.chan}cfgSave();applyCfg();bcast();
     if(k==="chan"||k==="bot")twConnect();if(k==="blind"){renderNow(false);renderLists()}
     if(k==="clean"){if(S.current){S.current.name=plName(S.current);save()}renderNow(false);renderLists()}};
 });
 $("gear").onclick=()=>$("modal").classList.add("open");
 $("mclose").onclick=()=>$("modal").classList.remove("open");
 $("modal").onclick=e=>{if(e.target===$("modal"))$("modal").classList.remove("open")};
-const ovLink=()=>location.origin+"/overlay.html"+(cfg.ovq?"":"?q=0");
+const ovLink=()=>location.origin+"/overlay.html?room="+cfg.room+(cfg.ovq?"":"&q=0");
 $("ov-copy").onclick=async()=>{try{await navigator.clipboard.writeText(ovLink());toast("Ссылка скопирована ✓")}catch(e){toast(ovLink())}};
-$("ov-win").onclick=()=>window.open("/overlay.html?bg=green"+(cfg.ovq?"":"&q=0"),"hmstr_overlay","width=980,height=420");
+$("ov-win").onclick=()=>window.open("/overlay.html?bg=green&room="+cfg.room+(cfg.ovq?"":"&q=0"),"hmstr_overlay","width=980,height=420");
 $("d-exp").onclick=()=>{const b=new Blob([JSON.stringify({S,cfg},null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="hmstr-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 $("d-imp").onclick=()=>$("d-file").click();
 $("d-file").onchange=async e=>{try{const j=JSON.parse(await e.target.files[0].text());if(j.S){S=fixS(j.S);save()}if(j.cfg){Object.assign(cfg,j.cfg);cfgSave();location.reload();return}show();toast("Импортировано ✓")}catch(x){toast("Не удалось прочитать файл")}};
 /* oEmbed: название и обложка для Spotify / SoundCloud */
-async function meta(c){if(!c||c.title||!isUrl(c.text)||ytId(c.text))return;let u=null;
+async function ytMeta(x){const id=ytId(x.text);if(!id||x.author)return false;const u="https://www.youtube.com/watch?v="+id;
+  for(const f of["https://www.youtube.com/oembed?format=json&url=","https://noembed.com/embed?url="]){
+    try{const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),3000),j=await(await fetch(f+encodeURIComponent(u),{signal:ctl.signal})).json();clearTimeout(tm);
+      if(j.author_name){x.author=j.author_name;if(!x.title&&j.title)x.title=j.title;x.name=plName(x);return true}}catch(e){}}
+  return false}
+async function enrichPl(){const r=await Promise.all(plItems().map(ytMeta)),ch=r.some(Boolean);if(ch)save();return ch}
+async function meta(c){if(c&&ytId(c.text)&&!c.author){const id=c.id;setTimeout(async()=>{if(S.current&&S.current.id===id&&!S.current.author&&await ytMeta(S.current)){save();renderNow(false);renderLists()}},4000);return}
+  if(!c||c.title||!isUrl(c.text)||ytId(c.text))return;let u=null;
   if(/open\.spotify\.com/.test(c.text))u="https://open.spotify.com/oembed?url="+encodeURIComponent(c.text);else if(/soundcloud\.com/.test(c.text))u="https://soundcloud.com/oembed?format=json&url="+encodeURIComponent(c.text);
   if(!u)return;const id=c.id;
   try{const j=await(await fetch(u)).json();if(!S.current||S.current.id!==id||!j.title)return;const a=j.author_name||"";let t=String(j.title);if(a&&t.endsWith(" by "+a))t=t.slice(0,-(" by "+a).length);
     Object.assign(S.current,{title:t,author:a,thumb:j.thumbnail_url||""});S.current.name=plName(S.current);save();renderNow(false);renderLists()}catch(e){}}
 /* таймер трека */
-setInterval(()=>{const c=S.current;let t="";if(c){try{if(player&&player.getDuration&&player.getDuration()>0)t=fmt(player.getCurrentTime())+" / "+fmt(player.getDuration())}catch(e){}if(!t)t="⏱ "+fmt((Date.now()-(c.t0||Date.now()))/1000)}$("tm").textContent=t},500);
+setInterval(()=>{const c=S.current;let t="",p=0;if(c){try{if(player&&player.getDuration&&player.getDuration()>0){const d=player.getDuration(),cu=player.getCurrentTime();t=fmt(cu)+" / "+fmt(d);p=cu/d*100}}catch(e){}if(!t)t="⏱ "+fmt((Date.now()-(c.t0||Date.now()))/1000)}$("tm").textContent=t;$("pg").style.width=Math.min(100,p)+"%"},500);
+$("prog").onclick=e=>{try{const d=player.getDuration();if(d>0){const r=e.currentTarget.getBoundingClientRect();player.seekTo(d*(e.clientX-r.left)/r.width,true)}}catch(x){}};
 /* синхронизация вкладок */
 addEventListener("storage",e=>{if(e.key!==KEY)return;const old=S.current&&S.current.id;try{S=fixS(JSON.parse(e.newValue))}catch(x){return}if((S.current&&S.current.id)!==old)show();else{renderNow(false);renderLists()}});
 /* звуки: проверка */
@@ -478,7 +579,27 @@ $("sum").onclick=openSum;$("sclose").onclick=()=>$("smodal").classList.remove("o
 $("s-png").onclick=()=>$("sc").toBlob(b=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="hmstr-story.png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
 $("x-copy").onclick=async()=>{try{await navigator.clipboard.writeText(plItems().map(plOut).join("\n"));toast("Скопировано ✓")}catch(e){toast("Не удалось скопировать")}};
 $("x-csv").onclick=()=>{const q=v=>'"'+String(v).replace(/"/g,'""')+'"',rows=[["Artist","Title","Link"],...plItems().map(x=>[...splitN(x),x.text])],b=new Blob(["\ufeff"+rows.map(r=>r.map(q).join(",")).join("\n")],{type:"text/csv"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="hmstr-playlist.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
-applyCfg();twConnect();
+/* синхронизация с оверлеем через WebRTC (PeerJS), не зависит от браузера/профиля */
+const pubState=()=>{const c=S.current;return{t:Date.now(),theme,blind:!!cfg.blind,snd:cfg.snd,sndVol:cfg.sndVol,current:c?{id:c.id,text:c.text,name:c.name,title:c.title,nick:c.nick,rating:c.rating||null,thumb:c.thumb||""}:null,queue:S.queue.slice(0,5).map(x=>({id:x.id,text:x.text,nick:x.nick}))}};
+function bcast(){try{conns=conns.filter(c=>c.open);if(!conns.length)return;const m=pubState();conns.forEach(c=>c.send(m))}catch(e){}}
+function ovSt(){const n=conns.filter(c=>c.open).length,e=$("ov-st");if(!e)return;e.textContent=peerErr||(n?"оверлей подключён"+(n>1?" ("+n+")":""):"ждёт оверлей");$("ov-dot").className="dot"+(n&&!peerErr?" ok":"")}
+function peerStart(){
+  clearTimeout(peerT);
+  if(!window.Peer){peerErr="нет связи с сервером синхронизации";ovSt();return}
+  try{if(peer&&!peer.destroyed)peer.destroy();conns=[];peer=new Peer("hmstrfm-"+cfg.room);
+    peer.on("open",()=>{peerErr="";ovSt()});
+    peer.on("connection",c=>{c.on("open",()=>{conns.push(c);try{c.send(pubState())}catch(e){}ovSt()});const gone=()=>{conns=conns.filter(x=>x!==c);ovSt()};c.on("close",gone);c.on("error",gone)});
+    peer.on("disconnected",()=>{try{peer.reconnect()}catch(e){}});
+    peer.on("error",e=>{peerErr=e.type==="unavailable-id"?"комната занята: закрой другие вкладки панели":"ошибка связи ("+e.type+")";ovSt();peerT=setTimeout(peerStart,5000)});
+  }catch(e){peerErr="ошибка запуска синхронизации";ovSt()}
+}
+addEventListener("beforeunload",()=>{try{peer&&peer.destroy()}catch(e){}});setInterval(bcast,5000);
+/* плейлист: подтянуть исполнителей перед копированием */
+$("exp").onclick=async()=>{await enrichPl();const all=plItems().map(plOut).join("\n");if(!all)return toast("Плейлист пока пуст");try{await navigator.clipboard.writeText(all);toast("Плейлист скопирован ✓")}catch(e){toast("Не удалось скопировать")}};
+$("x-copy").onclick=async()=>{await enrichPl();try{await navigator.clipboard.writeText(plItems().map(plOut).join("\n"));toast("Скопировано ✓")}catch(e){toast("Не удалось скопировать")}};
+$("sum").onclick=()=>{openSum();enrichPl().then(ch=>{if(ch&&$("smodal").classList.contains("open"))openSum()})};
+setInterval(()=>{const c=S.current;if(c&&player&&!c.author&&ytId(c.text))grab()},1500);
+applyCfg();twConnect();peerStart();
 setTheme(theme);show();
 </script>
 </body>

@@ -1,12 +1,14 @@
-/* HMSTR.FM — синтезированные звуки (без файлов). window.SFX.jingle/applause/horn */
-(function(){let A=null;
-const ac=()=>{try{A=A||new(window.AudioContext||window.webkitAudioContext)();if(A.state==="suspended")A.resume()}catch(e){}return A};
-function tone(f,t,d,ty,g,f2){const a=ac(),T=a.currentTime+t,o=a.createOscillator(),v=a.createGain();o.type=ty;o.frequency.setValueAtTime(f,T);if(f2)o.frequency.exponentialRampToValueAtTime(f2,T+d);
-  v.gain.setValueAtTime(0,T);v.gain.linearRampToValueAtTime(g,T+.02);v.gain.setValueAtTime(g,T+d*.7);v.gain.exponentialRampToValueAtTime(.0001,T+d);o.connect(v);v.connect(a.destination);o.start(T);o.stop(T+d+.05)}
+/* HMSTR.FM — мягкие синтезированные звуки. Громкость: cfg.sndVol (0–100), по умолчанию 25 */
+(function(){let A=null,M=null;
+const vol=()=>{if(typeof window.SFX_VOL==="number")return window.SFX_VOL/100;try{const v=JSON.parse(localStorage.getItem("hmstr_cfg")).sndVol;return(v==null?25:v)/100}catch(e){return .25}};
+const ac=()=>{try{if(!A){A=new(window.AudioContext||window.webkitAudioContext)();const g=A.createGain(),f=A.createBiquadFilter(),c=A.createDynamicsCompressor();f.type="lowpass";f.frequency.value=2800;g.connect(f);f.connect(c);c.connect(A.destination);M=g}if(A.state==="suspended")A.resume();M.gain.value=vol()}catch(e){}return A};
+function tone(f,t,d,ty,g,f2,lp){const a=ac(),T=a.currentTime+t,o=a.createOscillator(),v=a.createGain();o.type=ty;o.frequency.setValueAtTime(f,T);if(f2)o.frequency.exponentialRampToValueAtTime(f2,T+d);
+  v.gain.setValueAtTime(0,T);v.gain.linearRampToValueAtTime(g,T+.04);v.gain.setValueAtTime(g,T+d*.6);v.gain.exponentialRampToValueAtTime(.0001,T+d);
+  let n=o;if(lp){const q=a.createBiquadFilter();q.type="lowpass";q.frequency.value=lp;o.connect(q);n=q}n.connect(v);v.connect(M);o.start(T);o.stop(T+d+.05)}
 function noise(t,d,g,fq){const a=ac(),T=a.currentTime+t,n=Math.floor(a.sampleRate*d),b=a.createBuffer(1,n,a.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=Math.random()*2-1;
-  const s=a.createBufferSource(),f=a.createBiquadFilter(),v=a.createGain();s.buffer=b;f.type="bandpass";f.frequency.value=fq;v.gain.setValueAtTime(g,T);v.gain.exponentialRampToValueAtTime(.0001,T+d);s.connect(f);f.connect(v);v.connect(a.destination);s.start(T)}
+  const s=a.createBufferSource(),f=a.createBiquadFilter(),v=a.createGain();s.buffer=b;f.type="bandpass";f.frequency.value=fq;f.Q.value=.8;v.gain.setValueAtTime(0,T);v.gain.linearRampToValueAtTime(g,T+.02);v.gain.exponentialRampToValueAtTime(.0001,T+d);s.connect(f);f.connect(v);v.connect(M);s.start(T)}
 window.SFX={
-  jingle(){[523,659,784,1047].forEach((f,i)=>tone(f,i*.09,.28,"triangle",.14))},
-  applause(){for(let i=0;i<70;i++)noise(i*.04+Math.random()*.03,.14,.3,1200+Math.random()*3500)},
-  horn(){[[0,.28],[.34,.28],[.68,1]].forEach(([t,d])=>[466,554,698,932].forEach(f=>tone(f,t,d,"sawtooth",.07,f*.96)))}
+  jingle(){[659,784,988].forEach((f,i)=>tone(f,i*.1,.45,"sine",.22))},
+  applause(){for(let i=0;i<55;i++)noise(i*.05+Math.random()*.04,.16,.12,800+Math.random()*1800)},
+  horn(){[[0,.3],[.36,.3],[.72,.9]].forEach(([t,d])=>[392,494,587].forEach(f=>tone(f,t,d,"sawtooth",.05,f*.97,1400)))}
 };})();
