@@ -1,20 +1,26 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="hamster">
+<html lang="ru" data-theme="silver">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>HMSTR.FM — оверлей</title>
 <style>
-:root{--ac:#ff8a3d;--ac2:#ffc46b;--card:rgba(24,17,12,.86)}
+:root{--ac:#b9bfd6;--ac2:#f4a6b8;--card:rgba(20,22,32,.88)}
 [data-theme=neon]{--ac:#ff2bd6;--ac2:#00e5ff;--card:rgba(26,9,56,.88)}
 [data-theme=space]{--ac:#7c9cff;--ac2:#c39bff;--card:rgba(10,16,42,.88)}
 [data-theme=lagoon]{--ac:#2fe3b0;--ac2:#6ad6ff;--card:rgba(6,44,42,.88)}
 [data-theme=sakura]{--ac:#ff7eb6;--ac2:#ffc2dd;--card:rgba(44,19,34,.88)}
 [data-theme=matrix]{--ac:#00ff7f;--ac2:#b6ff5e;--card:rgba(2,20,10,.9)}
-[data-theme=retro]{--ac:#ffb02e;--ac2:#ff6b3d;--card:rgba(50,29,10,.88)}
+[data-theme=retro]{--ac:#b79cff;--ac2:#8c6bff;--card:rgba(16,13,22,.9)}
 [data-theme=volcano]{--ac:#ff3b3b;--ac2:#ff9a8a;--card:rgba(40,10,10,.88)}
 [data-theme=platinum]{--ac:#e4e8f0;--ac2:#b4bdd0;--card:rgba(20,22,30,.88)}
 [data-theme=stage]{--ac:#ffe11a;--ac2:#fff59a;--card:rgba(34,28,6,.9)}
+[data-theme=silver]{--ac:#b9bfd6;--ac2:#f4a6b8;--card:rgba(20,22,32,.88)}
+[data-theme=firefly]{--ac:#e8ff8a;--ac2:#7fe3b0;--card:rgba(10,26,20,.9)}
+[data-theme=rose]{--ac:#e59ab0;--ac2:#f6d6c8;--card:rgba(36,20,28,.88)}
+[data-theme=ink]{--ac:#e9c46a;--ac2:#8fb8de;--card:rgba(10,20,42,.9)}
+[data-theme=mint]{--ac:#8ff0cf;--ac2:#ffe3c2;--card:rgba(14,32,28,.9)}
+[data-theme=snow]{--ac:#cfe6ff;--ac2:#a6b8ff;--card:rgba(12,20,44,.9)}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:transparent;color:#fff;font-family:system-ui,"Segoe UI",Roboto,sans-serif}
 body.green{background:#00ff00}
@@ -190,7 +196,10 @@ function confetti(){const cs=["#ff8a3d","#ffd23f","#fff","#ff2bd6","#00e5ff","#3
 function upd(){
   const S=remote?{current:remote.current,queue:remote.queue}:rd(),c=S.current,cf=remote?{blind:remote.blind,snd:remote.snd}:rc();CF=cf;
   if(remote&&typeof remote.sndVol==="number")window.SFX_VOL=remote.sndVol;
-  document.documentElement.dataset.theme=remote?remote.theme||"hamster":localStorage.getItem("hmstr_theme")||"hamster";
+  const tn=remote?remote.theme||"silver":localStorage.getItem("hmstr_theme")||"silver";document.documentElement.dataset.theme=tn;
+  {const R=document.documentElement.style,cc=tn==="custom"?(remote?remote.cc:rc().cc):null,H=/^#[0-9a-f]{6}$/i;
+   if(cc&&H.test(cc[0])&&H.test(cc[1])){R.setProperty("--ac",cc[0]);R.setProperty("--ac2",cc[1]);R.setProperty("--card","color-mix(in srgb,"+cc[0]+" 10%,rgba(14,14,20,.9))")}
+   else{R.removeProperty("--ac");R.removeProperty("--ac2");R.removeProperty("--card")}}
   const card=$("card"),id=c?c.id:null,r=c&&c.rating,hide=!!(cf.blind&&c&&!r);
   let name=c?(c.name||c.title||c.text||""):"";if(/^https?:/i.test(name)){try{name=new URL(name).hostname.replace(/^www\./,"")+" · трек по ссылке"}catch(e){}}
   if(id!==last.id){
