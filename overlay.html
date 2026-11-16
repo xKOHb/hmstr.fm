@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="kohb">
+<html lang="ru" data-theme="hmstr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KOHbツ.FM — оверлей</title>
+<title>HMSTR.FM — оверлей</title>
 <style>
 :root{--ac:#ff8a3d;--ac2:#ffc46b;--card:rgba(24,17,12,.86)}
 [data-theme=neon]{--ac:#ff2bd6;--ac2:#00e5ff;--card:rgba(26,9,56,.88)}
@@ -11,7 +11,7 @@
 [data-theme=lagoon]{--ac:#2fe3b0;--ac2:#6ad6ff;--card:rgba(6,44,42,.88)}
 [data-theme=sakura]{--ac:#ff7eb6;--ac2:#ffc2dd;--card:rgba(44,19,34,.88)}
 [data-theme=matrix]{--ac:#00ff7f;--ac2:#b6ff5e;--card:rgba(2,20,10,.9)}
-[data-theme=kohb]{--ac:#ff3341;--ac2:#e9e9ee;--card:rgba(14,14,16,.9)}
+[data-theme=hmstr]{--ac:#ff3341;--ac2:#e9e9ee;--card:rgba(14,14,16,.9)}
 [data-theme=retro]{--ac:#b79cff;--ac2:#8c6bff;--card:rgba(16,13,22,.9)}
 [data-theme=volcano]{--ac:#ff3b3b;--ac2:#ff9a8a;--card:rgba(40,10,10,.88)}
 [data-theme=platinum]{--ac:#e4e8f0;--ac2:#b4bdd0;--card:rgba(20,22,30,.88)}
@@ -222,7 +222,7 @@ html.lite .sc-ring{display:none}
 </head>
 <body>
 <div id="st">
-<div class="logo" id="logo">KOHbツ<b>.FM</b></div>
+<div class="logo" id="logo">HMSTR<b>.FM</b></div>
 <div class="chat" id="chat"></div>
 <iframe class="xchat" id="xchat" title="chat" allowtransparency="true"></iframe>
 <div class="clip" id="clip"><div class="cimg" id="cimg"></div><div class="cvid" id="cvid"><div id="yt"></div></div><div class="cscr" id="cscr"><video id="scrv" autoplay playsinline muted></video></div></div>
@@ -251,7 +251,7 @@ html.lite .sc-ring{display:none}
 </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
-<script>window.SFX_KEY="kohb_cfg"</script>
+<script>window.SFX_KEY="hmstr_cfg"</script>
 <script src="sfx.js"></script>
 <script>
 const P=new URLSearchParams(location.search),$=id=>document.getElementById(id);
@@ -267,8 +267,8 @@ addEventListener("resize",fit);fit();
 /* ?sw=880 — ширина окна клипа, пока показывается вкладка браузера */
 {const sw=parseInt(P.get("sw"),10);if(sw)STG.style.setProperty("--sw",Math.max(320,Math.min(1700,sw))+"px")}
 /* чат (по умолчанию внешний, включён): ?chatt=30 — сколько секунд живёт сообщение */
-const CHAT_URL="https://chat.eblo.id/chat/overlay/?channel=xk0hb&font=2&shadow=1&nick_name=display&nick_cut=off&smooth=10&fade=20&max_lines=10&chatterino_badges=true&ffz_badges=true&homies_badges=true&effects=false&link_urls=hide&gif_size=small&events=announcement%2Csub%2Cgift%2Craid%2Ccheer&collapse_spam=true&sv=3";
-/* ссылку на чат можно вставить в настройках панели (приходит по WebRTC), ?chaturl= сильнее её. Чат по умолчанию ВКЛЮЧЁН: внешний chat.eblo.id (канал xk0hb) в рамке. ?chat=0 — выключить; ?chat=own — встроенный простой чат (через панель).
+const CHAT_URL="https://chat.eblo.id/chat/overlay/?channel=h_mst_r&font=2&shadow=1&nick_name=display&nick_cut=off&smooth=10&fade=20&max_lines=10&chatterino_badges=true&ffz_badges=true&homies_badges=true&effects=false&link_urls=hide&gif_size=small&events=announcement%2Csub%2Cgift%2Craid%2Ccheer&collapse_spam=true&sv=3";
+/* ссылку на чат можно вставить в настройках панели (приходит по WebRTC), ?chaturl= сильнее её. Чат по умолчанию ВКЛЮЧЁН: внешний chat.eblo.id (канал h_mst_r) в рамке. ?chat=0 — выключить; ?chat=own — встроенный простой чат (через панель).
    ?chath=560 — высота рамки чата, ?chaty=0 — сдвиг сверху в px (можно отрицательный); ?chan=имя — другой канал; ?chaturl=… — свой адрес чата целиком */
 const CM=P.get("chat"),XCHAT=(CM!=="0"&&CM!=="own")||!!P.get("chaturl");
 let xcK="";
@@ -286,7 +286,7 @@ function applyChat(url,rev,on){
     f.style.display="block";const ch=parseInt(P.get("chath"),10),cy=parseInt(P.get("chaty"),10);    if(re){f.src="about:blank";setTimeout(()=>{f.src=u.href},80)}else f.src=u.href}catch(e){}
 }
 /* без WebRTC-связи сразу берём чат из настроек панели (localStorage), с ней ждём данные до 3 с, чтобы не грузить стандартный чат зря */
-setTimeout(()=>{if(!xcK){const c=(()=>{try{return JSON.parse(localStorage.getItem("kohb_cfg"))||{}}catch(e){return{}}})();applyChat(c.chatUrl,0,c.ovChat!==false);chatBox({x:c.chX,y:c.chY,w:c.chW,h:c.chH})}},P.get("room")?3000:0);
+setTimeout(()=>{if(!xcK){const c=(()=>{try{return JSON.parse(localStorage.getItem("hmstr_cfg"))||{}}catch(e){return{}}})();applyChat(c.chatUrl,0,c.ovChat!==false);chatBox({x:c.chX,y:c.chY,w:c.chW,h:c.chH})}},P.get("room")?3000:0);
 const CHAT=CM==="own",CHT=Math.max(5,parseInt(P.get("chatt"),10)||30);
 if(!CHAT)$("chat").style.display="none";
 function addChat(d){
@@ -298,8 +298,8 @@ function addChat(d){
   setTimeout(()=>{m.classList.add("old");setTimeout(()=>m.remove(),700)},CHT*1000);
 }
 const showQ=P.get("q")!=="0";
-const rd=()=>{try{return JSON.parse(localStorage.getItem("kohb_fm_v1"))||{}}catch(e){return{}}};
-const rc=()=>{try{return JSON.parse(localStorage.getItem("kohb_cfg"))||{}}catch(e){return{}}};
+const rd=()=>{try{return JSON.parse(localStorage.getItem("hmstr_fm_v1"))||{}}catch(e){return{}}};
+const rc=()=>{try{return JSON.parse(localStorage.getItem("hmstr_cfg"))||{}}catch(e){return{}}};
 const ytId=u=>((u||"").match(/(?:youtu\.be\/|[?&]v=|embed\/|shorts\/)([\w-]{11})/)||[])[1];
 const col=n=>`hsl(${(n-1)*13} 85% 58%)`;
 let last={id:null,rating:null,nk:null,q:"",th:null},hideT=null,ready=false;
@@ -311,7 +311,7 @@ function upd(){
   const S=remote?{current:remote.current,queue:remote.queue}:rd(),c=S.current,cf=remote?{blind:remote.blind,snd:remote.snd}:rc();CF=cf;if(remote){applyChat(remote.chatUrl,remote.chatRev,remote.chatOn);chatBox(remote.chatBox)}
   {const H=document.documentElement,ac=remote?remote.accent:rc().accent;if(/^#[0-9a-f]{6}$/i.test(ac||"")){H.style.setProperty("--ac",ac);H.style.setProperty("--ac2","color-mix(in srgb,"+ac+" 62%,#fff)")}else{H.style.removeProperty("--ac");H.style.removeProperty("--ac2")}}
   if(remote&&typeof remote.sndVol==="number")window.SFX_VOL=remote.sndVol;
-  document.documentElement.dataset.theme=remote?remote.theme||"kohb":localStorage.getItem("kohb_theme")||"kohb";
+  document.documentElement.dataset.theme=remote?remote.theme||"hmstr":localStorage.getItem("hmstr_theme")||"hmstr";
   const card=$("card"),id=c?c.id:null,r=c&&c.rating,hide=!!(cf.blind&&c&&!r);
   let name=c?(c.name||c.title||c.text||""):"";if(/^https?:/i.test(name)){try{name=new URL(name).hostname.replace(/^www\./,"")+" · трек по ссылке"}catch(e){}}
   if(id!==last.id){
@@ -384,7 +384,7 @@ function rJoin(){
   if(!ROOM||!window.Peer||(rConn&&rConn.open))return;
   if(!rPeer||rPeer.destroyed){try{rPeer=new Peer()}catch(e){return retry(5000)}rPeer.on("open",rJoin);rPeer.on("call",call=>{try{call.answer(undefined,{sdpTransform:s=>{try{const br=LITE?2500:8000;return s.replace(/(m=video[^\r\n]*\r\n)((?:[^m][^\r\n]*\r\n)*)/,(a,h,b)=>h+(/^c=/m.test(b)?b.replace(/(c=[^\r\n]*\r\n)/,"$1b=AS:"+br+"\r\n"):"b=AS:"+br+"\r\n"+b))}catch(e){return s}}});call.on("stream",scrAttach)}catch(e){}});rPeer.on("error",()=>retry(4000));rPeer.on("disconnected",()=>{try{rPeer.reconnect()}catch(e){}});return}
   if(!rPeer.open)return;
-  try{rConn=rPeer.connect("kohbfm-"+ROOM,{reliable:true})}catch(e){return retry()}
+  try{rConn=rPeer.connect("hmstrfm-"+ROOM,{reliable:true})}catch(e){return retry()}
   const c=rConn;c.on("data",d=>{if(d&&d.type==="chat"){addChat(d);return}remote=d;upd()});c.on("close",()=>retry());c.on("error",()=>retry());
   setTimeout(()=>{if(!c.open){try{c.close()}catch(e){}retry(500)}},8000);
 }
@@ -396,7 +396,7 @@ function scrSync(){const on=scrShown();$("cscr").classList.toggle("on",on);STG.c
 /* ===== v9 ===== */
 const esc=s=>String(s??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
 const fmt=t=>{t=Math.max(0,t|0);return(t/60|0)+":"+String(t%60).padStart(2,"0")};
-const rb=()=>{try{return JSON.parse(localStorage.getItem("kohb_brk"))||{}}catch(e){return{}}};
+const rb=()=>{try{return JSON.parse(localStorage.getItem("hmstr_brk"))||{}}catch(e){return{}}};
 const seedOf=id=>{let h=0;for(const ch of String(id))h=(h*31+ch.charCodeAt(0))|0;return Math.abs(h)};
 let PG={dur:0,pos:0,play:false,t:0,t0:0,has:false,seed:1},SC={on:false,kind:"break",end:0},tkK="",scK="",scEndSeen=0,scTot=0,scHints=[""],scHi=0,scHt=0;
 const evFrom=S=>{const r=[S.current,...(S.history||[])].filter(x=>x&&x.rating);return{cnt:r.length,avg:r.length?+(r.reduce((a,x)=>a+x.rating,0)/r.length).toFixed(1):null,pl:r.filter(x=>x.pl).length,top:[...r].sort((a,b)=>b.rating-a.rating).slice(0,5).map(x=>({n:x.name||x.title||x.text,r:x.rating}))}};
