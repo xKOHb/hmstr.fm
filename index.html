@@ -7,14 +7,14 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23111'/%3E%3Ccircle cx='50' cy='50' r='34' fill='none' stroke='%23333' stroke-width='3'/%3E%3Ccircle cx='50' cy='50' r='16' fill='%23ff3341'/%3E%3Ccircle cx='50' cy='50' r='3' fill='%23111'/%3E%3C/svg%3E">
 <meta name="description" content="HMSTR.FM — панель ведущей радио-стрима: очередь заявок, оценки и плейлист вечера.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://hmstrfm.vercel.app/">
+<meta property="og:url" content="https://xkohb.github.io/hmstr.fm/">
 <meta property="og:title" content="HMSTR.FM">
 <meta property="og:description" content="Панель ведущей радио-стрима: очередь заявок, оценки и плейлист вечера.">
-<meta property="og:image" content="https://hmstrfm.vercel.app/og.png?v=2">
+<meta property="og:image" content="https://xkohb.github.io/hmstr.fm/og.png?v=2">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://hmstrfm.vercel.app/og.png?v=2">
+<meta name="twitter:image" content="https://xkohb.github.io/hmstr.fm/og.png?v=2">
 <style>
 :root{color-scheme:dark;--bg:#17120f;--card:rgba(36,28,23,.72);--tx:#f5ece4;--mut:#a39284;--ac:#ff8a3d;--ac2:#ffc46b;--ln:rgba(255,255,255,.09);--in:rgba(0,0,0,.28)}
 [data-theme=neon]{--bg:#0d0221;--card:rgba(28,10,60,.7);--tx:#f3e9ff;--mut:#a58fd0;--ac:#ff2bd6;--ac2:#00e5ff}
@@ -209,13 +209,15 @@ html[data-mode=light] .vhs{display:none!important}
 html[data-fx=off] .vhs .nz,html[data-fx=off] .vhs .tr,html[data-fx=off] .vhs .vg{animation:none}
 /* settings, on-air, stage */
 #chbtn,#cobtn,#xfer{display:none!important}
-#chatdock{position:fixed;left:10px;top:76px;bottom:10px;width:var(--cdw,380px);z-index:3;display:flex;flex-direction:column;border:1px solid var(--ln);border-radius:16px;background:var(--card);overflow:hidden}
+#chatdock{position:fixed;left:10px;top:var(--cdt,96px);height:calc((100vh - var(--cdt,96px) - 10px)*var(--cdp,1));width:var(--cdw,380px);z-index:3;display:flex;flex-direction:column;border:1px solid var(--ln);border-radius:16px;background:var(--card);overflow:hidden}
 #chatdock[hidden]{display:none}#chatdock .cdh{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);border-bottom:1px solid var(--ln)}
 #chatdock .cdb{display:flex;gap:6px;align-items:center}#chatdock .cdb a{color:var(--mut);text-decoration:none;font-size:14px;cursor:pointer}#chatdock .cdb button{padding:2px 8px}
 .item.hi{cursor:pointer}#unrate[hidden]{display:none}
 #cd-rs{position:absolute;top:0;right:0;bottom:0;width:8px;cursor:ew-resize;z-index:2}#cd-rs:hover{background:color-mix(in srgb,var(--ac) 35%,transparent)}body.cdrag #chatdock iframe{pointer-events:none}body.cdrag{user-select:none}
 #chatdock .cdw{flex:1;min-height:0}#chatdock iframe{width:100%;height:100%;border:0;display:block}
 body.cdock main{margin-left:max(calc(var(--cdw,380px) + 20px),calc((100vw - 1280px)/2));margin-right:0}
+body.cdock.cdr #chatdock{left:auto;right:10px}body.cdock.cdr main{margin-right:max(calc(var(--cdw,380px) + 20px),calc((100vw - 1280px)/2));margin-left:0}body.cdr #cd-rs{right:auto;left:0}
+#chatdock .cdh>span:first-child{cursor:grab;touch-action:none;user-select:none;flex:1}
 @media(max-width:1099px){#chatdock{display:none!important}body.cdock main{margin:auto}}
 .stats{flex:1;text-align:center}
 #live{font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:.3px;white-space:nowrap}
@@ -593,6 +595,10 @@ function done(m){clean();if(m)alert(m);location.reload()}
     <div class="fld"><label for="c-bot">Принимать заявки из чата</label><input type="checkbox" id="c-bot"></div>
     <div class="fld"><label for="c-chan">Канал</label><input type="text" id="c-chan" placeholder="например, h_mst_r"></div>
     <div class="fld"><label for="c-chatw">↔ Ширина чата слева<small>можно и просто потянуть за правый край чата</small></label><input type="range" id="c-chatw" min="260" max="560" step="10"></div>
+    <div class="fld"><label for="c-chats">📍 Где чат<small>слева или справа от плеера; можно перетащить за заголовок чата</small></label><select id="c-chats"><option value="l">Слева</option><option value="r">Справа</option></select></div>
+    <div class="fld"><label for="c-chatauto">↕ Отступ сверху: подбирать сам<small>чат не закрывает шапку и строку статуса</small></label><input type="checkbox" id="c-chatauto"></div>
+    <div class="fld"><label for="c-chatt">↕ Отступ сверху<small>работает, когда «подбирать сам» выключено</small></label><input type="range" id="c-chatt" min="0" max="400" step="2"></div>
+    <div class="fld"><label for="c-chath">↕ Высота чата<small>в процентах от свободной высоты окна; верх остаётся на месте</small></label><input type="range" id="c-chath" min="25" max="100" step="5"></div>
     <div class="fld"><label for="c-chatdock">💬 Чат Twitch слева от плеера<small>виден при ширине окна от 1100 px; писать можно после входа в Twitch прямо в окне чата</small></label><input type="checkbox" id="c-chatdock"></div>
     <div class="fld"><label for="c-cmds">Команды</label><input type="text" id="c-cmds"></div>
     <div class="fld"><label for="c-autolink">🔗 Искать ссылку по названию<small>заявка без ссылки сама находит видео на YouTube; плеер заиграет её</small></label><input type="checkbox" id="c-autolink"></div>
@@ -641,7 +647,7 @@ function done(m){clean();if(m)alert(m);location.reload()}
 
   <details><summary>📋 Плейлист</summary><div class="sb">
     <div class="fld"><label for="c-clean">Чистить названия<small>убирает Official Video, Lyrics и т. п.</small></label><input type="checkbox" id="c-clean"></div>
-    <div class="fld"><label for="c-copy">Копировать как</label><select id="c-copy"><option value="names">Исполнитель – Название</option><option value="links">Ссылки</option></select></div>
+    <div class="fld"><label for="c-copy">Копировать как</label><select id="c-copy"><option value="names">Исполнитель – Название</option><option value="links">Ссылки</option><option value="yt">Ссылка на YouTube-плейлист</option></select></div>
   </div></details>
 
   <details id="xf-sec"><summary>🔗 Перенос в другой браузер <small>инкогнито, другой ПК, телефон</small></summary><div class="sb">
@@ -652,11 +658,8 @@ function done(m){clean();if(m)alert(m);location.reload()}
   <details id="pub-sec"><summary>🌐 Сайт заказов <span class="beta">НОВОЕ</span> <small>зрители заказывают треки на отдельной странице</small></summary><div class="sb">
     <div class="hint">Страница <b>request.html</b> лежит рядом с панелью. Зрители открывают ссылку, выбирают тему, вводят ник и трек, и заказ попадает в твою очередь. Панель должна быть открыта.</div>
     <div class="fld"><label for="c-pubon">🌐 Принимать заказы с сайта</label><input type="checkbox" id="c-pubon"></div>
-    <div class="fld"><label for="pub-url">🌍 Основная ссылка<small>для зрителей из Украины, Европы и других стран; вставь в описание стрима или в команду !сайт</small></label><input type="text" id="pub-url" class="cocode" readonly placeholder="включи приём заказов"></div>
-    <div class="fld"><label for="c-pubmirror">🇷🇺 Зеркало для РФ<small>адрес второй копии сайта на другом хостинге, например https://hmstr-fm.pages.dev (без /request.html)</small></label><input type="text" id="c-pubmirror" maxlength="120" placeholder="https://…"></div>
-    <div class="fld"><label for="pub-url2">🇷🇺 Ссылка для зрителей из РФ<small>появится, когда укажешь зеркало</small></label><input type="text" id="pub-url2" class="cocode" readonly placeholder="укажи адрес зеркала выше"></div>
-    <div class="row"><button id="pub-copy">📋 Основная</button><button id="pub-copy2" class="ghost">📋 Для РФ</button><button id="pub-new" class="ghost">🔑 Новый код ссылки</button></div>
-    <div class="hint">Зеркало — тот же репозиторий, подключённый ко второму хостингу (Cloudflare Pages, Netlify, GitHub Pages). Код ссылки у обеих одинаковый, заказы приходят в одну очередь. Панель держи открытой на любой из копий.</div>
+    <div class="fld"><label for="pub-url">🔗 Ссылка для зрителей<small>вставь в описание стрима или в команду !сайт</small></label><input type="text" id="pub-url" class="cocode" readonly placeholder="включи приём заказов"></div>
+    <div class="row"><button id="pub-copy">📋 Скопировать ссылку</button><button id="pub-new" class="ghost">🔑 Новый код ссылки</button></div>
     <div class="fld"><label for="c-pubq">📋 Показывать зрителям очередь</label><input type="checkbox" id="c-pubq"></div>
     <div class="fld"><label for="c-pubpause">⏸ Пауза заказов<small>страница работает, но новые заказы не принимаются</small></label><input type="checkbox" id="c-pubpause"></div>
     <div class="fld"><label for="c-pubmsg">📢 Сообщение для зрителей<small>показывается наверху страницы заказов</small></label><input type="text" id="c-pubmsg" maxlength="160" placeholder="например: сегодня только русский рэп"></div>
@@ -998,7 +1001,7 @@ function onChat(tags,login,msg){
 /* settings UI */
 $("tgrid").innerHTML=THEMES.map(([k,n,g])=>`<button class="tc" data-t="${k}"><div class="pv" style="background:${g}"></div><span>${n}</span></button>`).join("");
 $("tgrid").onclick=e=>{const b=e.target.closest(".tc");if(b)setTheme(b.dataset.t)};
-[["c-coname","coName","s"],["c-autolink","autoLink","b"],["c-pubon","pubOn","b"],["c-pubguess","pubGuess","b"],["c-pubpause","pubPause","b"],["c-pubmsg","pubMsg","s"],["c-pubfx","pubFx","b"],["c-pubq","pubQ","b"],["c-pubmod","pubMod","b"],["c-pubtw","pubTw","b"],["c-chatdock","chatDock","b"],["c-devtg","devTg","s"],["c-pubmirror","pubMirror","s"],["c-fxtab","fxTab","b"],["c-fxreq","fxReq","b"],["c-fxauto","fxAuto","b"],["c-fxup","fxUp","b"],["c-fxfind","fxFind","b"],["c-fxundo","fxUndo","b"],["c-cofx","coFx","b"],["c-cosnd","coSnd","b"],["c-cochat","coChat","b"],["c-copp","coPp","b"],["c-conx","coNx","b"],["c-coqu","coQu","b"],["c-coad","coAd","b"],["c-comod","coMod","b"],["c-cobadge","coBadge","b"],["c-corshow","coRShow","b"],["c-chan","chan","s"],["c-bot","bot","b"],["c-cmds","cmds","s"],["c-maxq","maxq","n"],["c-cd","cd","n"],["c-maxmin","maxMin","n"],["c-lenskip","lenSkip","b"],["c-compact","compact","b"],["c-lite","lite","b"],["c-ovchat","ovChat","b"],["c-churl","chatUrl","s"],["c-chx","chX","n"],["c-chy","chY","n"],["c-chw","chW","n"],["c-chh","chH","n"],["c-ovfx","ovFx","b"],["c-ovlogo","ovLogo","b"],["c-accent","accent","s"],["c-scale","scale","n"],["c-hs","hideStats","b"],["c-hh","hideHist","b"],["c-hk","hideKbd","b"],["c-don","donWord","s"],["c-tags","tagList","s"],["c-scrw","scrW","n"],["c-scra","scrAudio","b"],["c-mode","mode","s"],["c-clean","clean","b"],["c-copy","copy","s"],["c-fxbg","fxBg","b"],["c-fxb","fxBurst","b"],["c-ovq","ovq","b"],["c-sndv","sndVol","n"],["c-snd","snd","s"],["c-blind","blind","b"],["c-bann","banNicks","s"],["c-banw","banWords","s"],["c-conf","conf","b"]].forEach(([id,k,ty])=>{
+[["c-coname","coName","s"],["c-autolink","autoLink","b"],["c-pubon","pubOn","b"],["c-pubguess","pubGuess","b"],["c-pubpause","pubPause","b"],["c-pubmsg","pubMsg","s"],["c-pubfx","pubFx","b"],["c-pubq","pubQ","b"],["c-pubmod","pubMod","b"],["c-pubtw","pubTw","b"],["c-chatdock","chatDock","b"],["c-devtg","devTg","s"],["c-fxtab","fxTab","b"],["c-fxreq","fxReq","b"],["c-fxauto","fxAuto","b"],["c-fxup","fxUp","b"],["c-fxfind","fxFind","b"],["c-fxundo","fxUndo","b"],["c-cofx","coFx","b"],["c-cosnd","coSnd","b"],["c-cochat","coChat","b"],["c-copp","coPp","b"],["c-conx","coNx","b"],["c-coqu","coQu","b"],["c-coad","coAd","b"],["c-comod","coMod","b"],["c-cobadge","coBadge","b"],["c-corshow","coRShow","b"],["c-chan","chan","s"],["c-bot","bot","b"],["c-cmds","cmds","s"],["c-maxq","maxq","n"],["c-cd","cd","n"],["c-maxmin","maxMin","n"],["c-lenskip","lenSkip","b"],["c-compact","compact","b"],["c-lite","lite","b"],["c-ovchat","ovChat","b"],["c-churl","chatUrl","s"],["c-chx","chX","n"],["c-chy","chY","n"],["c-chw","chW","n"],["c-chh","chH","n"],["c-ovfx","ovFx","b"],["c-ovlogo","ovLogo","b"],["c-accent","accent","s"],["c-scale","scale","n"],["c-hs","hideStats","b"],["c-hh","hideHist","b"],["c-hk","hideKbd","b"],["c-don","donWord","s"],["c-tags","tagList","s"],["c-scrw","scrW","n"],["c-scra","scrAudio","b"],["c-mode","mode","s"],["c-clean","clean","b"],["c-copy","copy","s"],["c-fxbg","fxBg","b"],["c-fxb","fxBurst","b"],["c-ovq","ovq","b"],["c-sndv","sndVol","n"],["c-snd","snd","s"],["c-blind","blind","b"],["c-bann","banNicks","s"],["c-banw","banWords","s"],["c-conf","conf","b"]].forEach(([id,k,ty])=>{
   const el=$(id);if(ty==="b")el.checked=!!cfg[k];else el.value=cfg[k]==null?"":cfg[k];
   el.onchange=()=>{cfg[k]=ty==="b"?el.checked:ty==="n"?+el.value:el.value.trim();if(k==="chan"){cfg.chan=chanName(el.value);el.value=cfg.chan}cfgSave();applyCfg();bcast();
     if(k==="chan"||k==="bot")twConnect();if(k==="blind"){renderNow(false);renderLists()}
@@ -1031,7 +1034,7 @@ $("d-imp").onclick=()=>$("d-file").click();
 $("d-file").onchange=async e=>{try{const j=JSON.parse(await e.target.files[0].text());if(j.S){S=fixS(j.S);save()}if(Array.isArray(j.arch)&&j.arch.length)ls.set("hmstr_arch",JSON.stringify(j.arch.slice(-60)));if(j.cfg){const{room:_r,coKey:_k,coOpen:_o,pubCode:_pc,...jc}=j.cfg;Object.assign(cfg,jc);cfgSave();location.reload();return}show();toast("Импортировано ✓")}catch(x){toast("Не удалось прочитать файл")}};
 /* v26: название по ссылке через сервер (/api/meta), если oEmbed из браузера не ответил */
 const MAINO="https://hmstrfm.vercel.app",DEFCH="h_mst_r";
-const APPV="v28.2";
+const APPV="v28.3";
 async function metaApi(u){const bases=[""];try{if(MAINO&&location.origin!==MAINO)bases.push(MAINO)}catch(e){}
   for(const b of bases){if(!b&&!/^https?:$/.test(location.protocol))continue;try{const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),6000),r=await fetch(b+"/api/meta?url="+encodeURIComponent(u),{signal:ctl.signal});clearTimeout(tm);if(!r.ok)continue;const j=await r.json();if(j&&j.ok&&j.title)return j}catch(e){}}return null}
 /* oEmbed: название и обложка для Spotify / SoundCloud */
@@ -1102,6 +1105,10 @@ addEventListener("storage",e=>{if(e.key!==KEY)return;const old=S.current&&S.curr
 $("t-j").onclick=()=>window.SFX&&SFX.jingle();$("t-a").onclick=()=>window.SFX&&SFX.applause();$("t-h").onclick=()=>window.SFX&&SFX.horn();
 /* итоги вечера */
 const plItems=()=>[S.current,...S.history].filter(x=>x&&x.pl);
+const PL_HOSTS=/^(?:[\w-]+\.)*(?:youtube\.com|youtu\.be|spotify\.com|soundcloud\.com|music\.yandex\.(?:ru|com|by|kz|uz)|deezer\.com|music\.apple\.com|bandcamp\.com)$/i;
+function plLink(x){const t=String(x&&x.text||"").trim(),y=ytId(t);if(y)return"https://youtu.be/"+y;if(!/^https?:\/\//i.test(t)||t.length>300)return"";try{const u=new URL(t);return u.protocol==="https:"&&PL_HOSTS.test(u.hostname)?u.href:""}catch(e){return""}}
+const plMood=x=>(x&&Array.isArray(x.tags)&&x.tags[0])?String(x.tags[0]).slice(0,20):"";
+function plText(){const it=plItems();if(cfg.copy==="yt"){const ids=[...new Set(it.map(x=>ytId(x.text)).filter(Boolean))].slice(0,50);if(ids.length)return"https://www.youtube.com/watch_videos?video_ids="+ids.join(",")}return it.map(plOut).join("\n")}
 const splitN=x=>{const n=plRaw(x),m=n.match(/^(.+?)\s[–-]\s(.+)$/);return isUrl(n)?["",n]:m?[m[1],m[2]]:["",n]};
 function fit(g,t,w){if(g.measureText(t).width<=w)return t;while(t.length>1&&g.measureText(t+"…").width>w)t=t.slice(0,-1);return t+"…"}
 const STORY_PAL={obsidian:["#3d7bff","#8fd0ff","#04050a"],ruby:["#e0115f","#ff9ab8","#14030a"],turq:["#00bfa6","#ffd98a","#021614"],copper:["#d9772b","#f5d0a9","#130a05"],indigo:["#5b4bff","#c0b8ff","#07041c"],pine:["#2e9d62","#e0d3a8","#04110a"],contrast:["#ff6a00","#00b4ff","#050a14"],tropics:["#ff4f9a","#19e6a6","#06130f"],rosegold:["#e0a39a","#f7d9cf","#150b0b"],ultraviolet:["#7c3aed","#22d3ee","#08031a"],empire:["#c1121f","#ffd166","#0d0204"],oled:["#00e5ff","#7af0ff","#000000"],olive:["#a9b665","#e0c97f","#0b0d06"],hmstr:["#ff3341","#e9e9ee","#09090a"],neon:["#ff2bd6","#00e5ff","#1a0938"],space:["#7c9cff","#c39bff","#0a102a"],lagoon:["#2fe3b0","#6ad6ff","#062c2a"],sakura:["#ff7eb6","#ffc2dd","#2c1322"],matrix:["#00ff7f","#b6ff5e","#02140a"],retro:["#b79cff","#8c6bff","#0e0a16"],volcano:["#ff3b3b","#ff9a8a","#280a0a"],platinum:["#e4e8f0","#b4bdd0","#14161e"],stage:["#ffe11a","#fff59a","#221c06"],aurora:["#4dffb0","#8f7bff","#04141b"],sunset:["#ff8a5c","#ffd36b","#3a1148"],frost:["#7fdcff","#d4f1ff","#0b2233"],toxic:["#c6ff00","#00ffa3","#050804"],gold:["#f5c451","#fff0b3","#0b0804"],lavender:["#cdb4ff","#9fd0ff","#120e1f"],peach:["#ffb38a","#ffd9a8","#1c1110"],candy:["#ff8fd0","#8fe3ff","#190f22"],midnight:["#9db4ff","#ffe7a0","#0c1636"],cocoa:["#e0a77a","#f6e0c8","#150e0b"],carbon:["#00d9ff","#ff2e63","#050506"],abyss:["#6f8cff","#00f5d4","#03152b"],eclipse:["#ffb347","#ff5e62","#0b0707"],nebula:["#c77dff","#ff6bd6","#12072a"],noir:["#e9e9e9","#9aa0a6","#0c0c0c"],storm:["#8ab4f8","#cfe0ff","#0b1424"],radar:["#ffb000","#ff6a00","#150f03"],cinema:["#ffd166","#ef476f","#1c0c10"],flow:["#ff7ab8","#7ab8ff","#1a0a40"],arcade:["#ffe600","#00e5ff","#0a0f3a"]};
@@ -1210,7 +1217,7 @@ $("s-nophoto").onclick=()=>{ls.set("hmstr_photo","");photoImg=null;if(storyArgs)
 loadPhoto();
 $("sum").onclick=openSum;$("sclose").onclick=()=>$("smodal").classList.remove("open");$("smodal").onclick=e=>{if(e.target===$("smodal"))$("smodal").classList.remove("open")};
 $("s-png").onclick=()=>$("sc").toBlob(b=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="hmstr-story.png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
-$("x-copy").onclick=async()=>{try{await navigator.clipboard.writeText(plItems().map(plOut).join("\n"));toast("Скопировано ✓")}catch(e){toast("Не удалось скопировать")}};
+$("x-copy").onclick=async()=>{try{await navigator.clipboard.writeText(plText());toast("Скопировано ✓")}catch(e){toast("Не удалось скопировать")}};
 $("x-csv").onclick=()=>{const q=v=>'"'+String(v).replace(/"/g,'""')+'"',rows=[["Artist","Title","Link"],...plItems().map(x=>[...splitN(x),x.text])],b=new Blob(["\ufeff"+rows.map(r=>r.map(q).join(",")).join("\n")],{type:"text/csv"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="hmstr-playlist.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 /* синхронизация с оверлеем через WebRTC (PeerJS), не зависит от браузера/профиля */
 /* показ вкладки браузера в оверлее: getDisplayMedia -> WebRTC call -> окно клипа (клавиша V) */
@@ -1423,7 +1430,7 @@ setTimeout(coUi,300);
 var pub=null,pubConns=[],pubErr="",pubTries=0,siteG={id:"",map:{}};
 const PUBPFX="hmstrfm-r-",PUBICE={config:{iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"},{urls:"stun:global.stun.twilio.com:3478"},{urls:["turn:eu-0.turn.peerjs.com:3478","turn:us-0.turn.peerjs.com:3478"],username:"peerjs",credential:"peerjsp"},{urls:["turn:openrelay.metered.ca:80","turn:openrelay.metered.ca:443","turns:openrelay.metered.ca:443?transport=tcp"],username:"openrelayproject",credential:"openrelayproject"}],sdpSemantics:"unified-plan"}};
 const pubUrl=()=>rootUrl()+"/request.html?r="+cfg.pubCode;
-const pubMir=()=>{const m=String(cfg.pubMirror||"").trim().replace(/\/+$/,"").replace(/\/request\.html.*$/i,"");return/^https:\/\/[\w.-]+(:\d+)?(\/[\w.\/-]*)?$/i.test(m)?m:""};
+const pubMir=()=>"";
 const pubUrl2=()=>pubMir()?pubMir()+"/request.html?r="+cfg.pubCode:"";
 function pubUi(){const n=pubConns.filter(c=>c.open).length,st=$("pub-st"),d=$("pub-dot"),u=$("pub-url");if(u)u.value=cfg.pubOn?pubUrl():"";const u2=$("pub-url2");if(u2)u2.value=cfg.pubOn?pubUrl2():"";
   if(st){st.textContent=!cfg.pubOn?"выключено":pubErr||(pub&&pub.open&&!pub.disconnected?(n?"зрителей на странице: "+n:"приём открыт, ждём зрителей"):"подключаюсь…");d.className="dot"+(cfg.pubOn&&!pubErr&&pub&&pub.open&&!pub.disconnected?" ok":"")}}
@@ -1449,7 +1456,7 @@ function siteHelloAll(){pubConns=pubConns.filter(c=>c.open);pubConns.forEach(c=>
 function siteReset(){siteG={id:"",map:{}};pubConns=pubConns.filter(c=>c.open);pubConns.forEach(c=>{try{c.send({t:"reset"})}catch(e){}});sitePush()}
 function siteState(){const c=S.current,bl=cfg.blind,nk=x=>bl?"???":x.nick;let b="";try{b=brk.on?brk.kind:""}catch(e){}
   const rated=S.history.filter(h=>h.rating),gv=(siteG.id&&c&&String(c.id)===siteG.id&&!c.rating)?Object.values(siteG.map):[];
-  return{t:"st",live:siteLive(),cur:c?{n:plName(c),by:nk(c),id:c.id,r:c.rating||0,lk:c.lk||0}:null,
+  return{t:"st",live:siteLive(),cur:c?{n:plName(c),by:nk(c),id:c.id,r:c.rating||0,lk:c.lk||0,pl:c.pl?1:0,y:ytId(c.text)||"",u:c.pl?plLink(c):""}:null,pls:plItems().slice(0,60).map(x=>({id:x.id,n:plName(x),by:nk(x),r:x.rating||0,y:ytId(x.text)||"",u:plLink(x),mo:plMood(x)})),
     q:cfg.pubQ===false?[]:S.queue.slice(0,40).map(x=>({id:x.id,n:plQ(x),by:nk(x),don:!!x.don})),n:S.queue.length,brk:b,
     h:S.history.slice(0,40).map(h=>({id:h.id,n:plName(h),by:nk(h),r:h.rating||0,pl:h.pl?1:0,sk:h.skipped?1:0})),
     avg:rated.length?+(rated.reduce((a,h)=>a+h.rating,0)/rated.length).toFixed(2):0,cnt:rated.length,
@@ -1528,8 +1535,7 @@ $("tx-copy").onclick=async()=>{const v=$("tx-url").value;try{await navigator.cli
 
 $("c-pubmsg").addEventListener("change",()=>sitePush());$("c-pubpause").addEventListener("change",()=>sitePush());
 $("pub-copy").onclick=async()=>{if(!cfg.pubOn)return toast("Сначала включи приём заказов");try{await navigator.clipboard.writeText(pubUrl());toast("Ссылка для зрителей скопирована ✓")}catch(e){$("pub-url").select();toast("Выдели и скопируй вручную")}};
-$("pub-copy2").onclick=async()=>{if(!cfg.pubOn)return toast("Сначала включи приём заказов");if(!pubUrl2())return toast("Сначала укажи адрес зеркала");try{await navigator.clipboard.writeText(pubUrl2());toast("Ссылка для зрителей из РФ скопирована ✓")}catch(e){$("pub-url2").select();toast("Выдели и скопируй вручную")}};
-$("c-pubtw").addEventListener("change",siteHelloAll);$("c-pubmirror").addEventListener("change",()=>{pubUi();siteHelloAll()});
+$("c-pubtw").addEventListener("change",siteHelloAll);
 /* v26: кнопка «В эфире» (видна зрителям на сайте заказов; выключается сама при «🏁 Конец стрима») */
 function liveUi(){const b=$("live");if(!b)return;const on=!!cfg.pubLive;if(on&&!cfg.pubLiveT){cfg.pubLiveT=Date.now();cfgSave()}b.classList.toggle("on",on);
   let t="";if(on&&cfg.fxUp!==false&&cfg.pubLiveT){const d=Math.max(0,Math.floor((Date.now()-cfg.pubLiveT)/1000));t='<span class="lt">'+Math.floor(d/3600)+":"+String(Math.floor(d%3600/60)).padStart(2,"0")+":"+String(d%60).padStart(2,"0")+"</span>"}
@@ -1541,12 +1547,26 @@ setInterval(()=>{if(cfg.pubLive&&!document.hidden)liveUi()},1000);liveUi();
 const cdMode=()=>document.documentElement.dataset.mode==="light"?"l":"d";
 function cdSet(w,sv){w=Math.max(260,Math.min(560,Math.round(+w||380)));document.documentElement.style.setProperty("--cdw",w+"px");cfg.chatW=w;const r=$("c-chatw");if(r)r.value=w;if(sv)cfgSave()}
 function dockUi(){const d=$("chatdock");if(!d)return;const ch=String(cfg.chan||DEFCH||"").trim(),ok=cfg.chatDock!==false&&/^\w{3,25}$/.test(ch)&&/^https?:$/.test(location.protocol);
-  cdSet(cfg.chatW,false);document.body.classList.toggle("cdock",ok);d.hidden=!ok;const w=$("cd-w"),k=ok?ch+"|"+cdMode():"";if(w.dataset.k===k)return;w.dataset.k=k;if(!ok){w.innerHTML="";return}
+  cdSet(cfg.chatW,false);cdLay();document.body.classList.toggle("cdock",ok);d.hidden=!ok;const w=$("cd-w"),k=ok?ch+"|"+cdMode():"";if(w.dataset.k===k)return;w.dataset.k=k;if(!ok){w.innerHTML="";return}
   w.innerHTML='<iframe src="https://www.twitch.tv/embed/'+encodeURIComponent(ch)+'/chat?parent='+encodeURIComponent(location.hostname)+(cdMode()==="d"?"&darkpopout":"")+'" title="Чат Twitch" loading="lazy"></iframe>';$("cd-pop").href="https://www.twitch.tv/popout/"+encodeURIComponent(ch)+"/chat?popout="}
 (function(){const h=$("cd-rs");if(!h)return;let on=false;h.addEventListener("pointerdown",e=>{on=true;document.body.classList.add("cdrag");try{h.setPointerCapture(e.pointerId)}catch(x){}e.preventDefault()});
-  h.addEventListener("pointermove",e=>{if(on)cdSet(e.clientX-10,false)});const up=()=>{if(!on)return;on=false;document.body.classList.remove("cdrag");cfgSave()};h.addEventListener("pointerup",up);h.addEventListener("pointercancel",up)})();
+  h.addEventListener("pointermove",e=>{if(on)cdSet(cfg.chatSide==="r"?innerWidth-e.clientX-10:e.clientX-10,false)});const up=()=>{if(!on)return;on=false;document.body.classList.remove("cdrag");cfgSave()};h.addEventListener("pointerup",up);h.addEventListener("pointercancel",up)})();
 try{new MutationObserver(()=>dockUi()).observe(document.documentElement,{attributes:true,attributeFilter:["data-mode"]})}catch(e){}
 $("c-chatw").addEventListener("input",e=>cdSet(e.target.value,true));
+function cdLay(){const d=$("chatdock");if(!d)return;const side=cfg.chatSide==="r"?"r":"l";document.body.classList.toggle("cdr",side==="r");
+  let t;if(cfg.chatAuto===false&&cfg.chatTop!=null)t=Math.max(0,Math.min(400,Math.round(+cfg.chatTop||0)));else{t=76;const hd=document.querySelector("header");if(hd){const r=hd.getBoundingClientRect();if(r.bottom>0)t=Math.max(t,r.bottom+10)}const cb=$("cobar");if(cb&&cb.offsetParent!==null){const r=cb.getBoundingClientRect();if(r.bottom>0)t=Math.max(t,r.bottom+10)}t=Math.round(Math.min(t,400))}
+  const p=Math.max(25,Math.min(100,+cfg.chatH||100))/100,R=document.documentElement.style;R.setProperty("--cdt",t+"px");R.setProperty("--cdp",String(p));
+  const a=$("c-chats");if(a)a.value=side;const sl=$("c-chatt");if(sl){sl.value=t;sl.disabled=cfg.chatAuto!==false}const au=$("c-chatauto");if(au)au.checked=cfg.chatAuto!==false;const hh=$("c-chath");if(hh)hh.value=Math.round(p*100)}
+$("c-chats").addEventListener("change",e=>{cfg.chatSide=e.target.value==="r"?"r":"l";cfgSave();cdLay()});
+$("c-chatauto").addEventListener("change",e=>{cfg.chatAuto=!!e.target.checked;if(!cfg.chatAuto&&cfg.chatTop==null)cfg.chatTop=parseInt(getComputedStyle(document.documentElement).getPropertyValue("--cdt"))||96;cfgSave();cdLay()});
+$("c-chatt").addEventListener("input",e=>{cfg.chatAuto=false;cfg.chatTop=+e.target.value;cfgSave();cdLay()});
+$("c-chath").addEventListener("input",e=>{cfg.chatH=+e.target.value;cfgSave();cdLay()});
+(function(){const h=document.querySelector("#chatdock .cdh>span:first-child");if(!h)return;let on=false,dy=0;
+  h.addEventListener("pointerdown",e=>{on=true;dy=e.clientY-$("chatdock").getBoundingClientRect().top;document.body.classList.add("cdrag");try{h.setPointerCapture(e.pointerId)}catch(x){}e.preventDefault()});
+  h.addEventListener("pointermove",e=>{if(!on)return;cfg.chatAuto=false;cfg.chatTop=Math.max(0,Math.min(400,Math.round(e.clientY-dy)));cdLay()});
+  const up=e=>{if(!on)return;on=false;document.body.classList.remove("cdrag");cfg.chatSide=e.clientX>innerWidth/2?"r":"l";cfgSave();cdLay()};h.addEventListener("pointerup",up);h.addEventListener("pointercancel",up)})();
+addEventListener("resize",cdLay);setInterval(()=>{if(cfg.chatAuto!==false)cdLay()},2000);
+
 /* v28: снять оценку */
 function unrUi(){const b=$("unrate");if(b)b.hidden=!(S.current&&S.current.rating)}
 function unrate(){const c=S.current;if(!c||!c.rating)return;if(CO.role==="guest"){toast("Это делает хозяин комнаты");return}
@@ -1633,8 +1653,8 @@ addEventListener("keydown",e=>{const tg=((document.activeElement||{}).tagName||"
 
 addEventListener("beforeunload",()=>{try{peer&&peer.destroy()}catch(e){}});setInterval(bcast,5000);setInterval(()=>{if(playing)bcast()},2000);
 /* плейлист: подтянуть исполнителей перед копированием */
-$("exp").onclick=async()=>{await enrichPl();const all=plItems().map(plOut).join("\n");if(!all)return toast("Плейлист пока пуст");try{await navigator.clipboard.writeText(all);toast("Плейлист скопирован ✓")}catch(e){toast("Не удалось скопировать")}};
-$("x-copy").onclick=async()=>{await enrichPl();try{await navigator.clipboard.writeText(plItems().map(plOut).join("\n"));toast("Скопировано ✓")}catch(e){toast("Не удалось скопировать")}};
+$("exp").onclick=async()=>{await enrichPl();const all=plText();if(!all)return toast("Плейлист пока пуст");try{await navigator.clipboard.writeText(all);toast("Плейлист скопирован ✓")}catch(e){toast("Не удалось скопировать")}};
+$("x-copy").onclick=async()=>{await enrichPl();try{await navigator.clipboard.writeText(plText());toast("Скопировано ✓")}catch(e){toast("Не удалось скопировать")}};
 $("sum").onclick=()=>{openSum();enrichPl().then(ch=>{if(ch&&$("smodal").classList.contains("open"))openSum()})};
 setInterval(()=>{const c=S.current;if(c&&player&&!c.author&&ytId(c.text))grab()},1500);
 /* лимит длины трека (только YouTube: длину знает плеер) */
