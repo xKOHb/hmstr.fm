@@ -8,12 +8,6 @@
 <meta name="description" content="Закажи трек на радио-стриме HMSTR.FM: выбери тему, введи ник и ссылку. Смотри очередь и оценки ведущей.">
 <meta property="og:title" content="HMSTR.FM: заказ трека">
 <meta property="og:description" content="Закажи трек на радио-стриме: ссылка или название, и он попадёт в очередь ведущей.">
-<meta property="og:type" content="website">
-<meta property="og:image" content="https://xkohb.github.io/hmstr.fm/og-request.png?v=1">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://xkohb.github.io/hmstr.fm/og-request.png?v=1">
 <style>
 :root{color-scheme:dark;--bg:#17120f;--card:rgba(36,28,23,.72);--tx:#f5ece4;--mut:#a39284;--ac:#ff8a3d;--ac2:#ffc46b;--ln:rgba(255,255,255,.09);--in:rgba(0,0,0,.28)}
 [data-theme=neon]{--bg:#0d0221;--card:rgba(28,10,60,.7);--tx:#f3e9ff;--mut:#a58fd0;--ac:#ff2bd6;--ac2:#00e5ff}
@@ -540,7 +534,7 @@ body.compact .m{display:none}
 .reo{padding:3px 9px;font-size:13px;flex:none}
 .eta{font-size:12px;color:var(--mut);white-space:nowrap}
 .ir{display:flex;gap:8px;align-items:center;flex:none}
-.rq-foot{text-align:center;color:var(--mut);font-size:12.5px;padding:6px 0 84px}
+.rq-foot{text-align:center;color:var(--mut);font-size:12.5px;padding:6px 0 26px}
 .fxe{position:fixed;bottom:70px;z-index:80;pointer-events:none;animation:fxUp 2.7s cubic-bezier(.2,.7,.3,1) forwards;filter:drop-shadow(0 4px 10px rgba(0,0,0,.45))}
 @keyframes fxUp{0%{transform:translateY(0) scale(.3);opacity:0}12%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{transform:translateY(-62vh) scale(1) rotate(12deg);opacity:0}}
 .spin{display:inline-block;animation:spn 1s linear infinite}
@@ -589,14 +583,13 @@ details.sg[open] summary{border-bottom:1px solid var(--ln);margin-bottom:6px}
 .fbl{display:flex;gap:8px;align-items:center;margin:10px 0;font-size:13px;color:var(--mut)}
 /* v26 */
 .air.idle{background:transparent;color:var(--mut);border-color:var(--ln);box-shadow:none}
-[data-theme=hmstr] header{background:rgba(13,13,15,.97)}
-.air.idle{position:static;inset:auto;display:inline-block;flex-direction:row;padding:5px 11px;gap:0;width:auto;text-align:center}
 #twc{padding:0;overflow:hidden}#twc[hidden]{display:none}
 #twc>summary{cursor:pointer;list-style:none;padding:16px 20px;font-weight:700;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)}
 #twc>summary::-webkit-details-marker{display:none}#twc[open]>summary{border-bottom:1px solid var(--ln)}
 .twb{padding:12px 14px}.tw-p{position:relative;padding-top:56.25%;border-radius:10px;overflow:hidden;background:#000}
 .tw-p iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .tw-c{height:360px;border-radius:10px;overflow:hidden;background:#0e0e10}.tw-c.big{height:640px}.tw-c iframe{width:100%;height:100%;border:0;display:block}
+.rq-fb{margin-top:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.07);font-size:12.5px;line-height:1.45}.rq-fb a{color:var(--ac)}
 .tw-st{margin-left:auto;margin-right:10px;font-size:11px;letter-spacing:.4px;color:#ff6b6b;font-weight:700;text-transform:none;white-space:nowrap}
 .tw-tabs{display:flex;gap:6px;margin-bottom:10px}.tw-tabs button{flex:1;padding:8px 10px;font-size:13px}.tw-tabs button.on{background:var(--ac);color:#111;border-color:transparent}
 .tw-live{font-style:normal;font-size:10px;background:#e91916;color:#fff;border-radius:4px;padding:1px 5px;margin-left:4px;letter-spacing:.5px}
@@ -747,14 +740,15 @@ const MSG={nocode:"Ссылка неполная: в ней нет кода ве
  nopeer:"Не загрузился модуль связи. Отключи блокировщик рекламы или VPN и нажми «Переподключиться».",
  connecting:"Подключаюсь к ведущей…",offline:"Ведущая сейчас не в сети (панель закрыта или спит). Я подключусь сам, как только она появится.",
  timeout:"Не получается соединиться. Бывает, если мобильный интернет, VPN или рабочая сеть блокируют соединение. Попробуй выключить VPN, переключиться между Wi-Fi и мобильной сетью и нажать «Переподключиться».",
- closed:"Связь оборвалась, переподключаюсь…",ok:""};
-function diag(k,extra){const n=$("note");const t=MSG[k]||"";$("note-t").innerHTML=(k==="connecting"||k==="closed"?'<span class="spin">⟳</span> ':"")+esc(t)+(extra?" "+esc(extra):"");n.classList.toggle("on",!!t)}
+ closed:"Связь оборвалась, переподключаюсь…",server:"Не получается связаться с сервером соединения (бывает при временном сбое, VPN или блокировщике рекламы). Пробую снова.",ok:""};
+function chatHint(){const ch=encodeURIComponent(twCh||"h_mst_r");return'<div class="rq-fb">💬 Пока связь не поднялась, можно заказать трек прямо в чате Twitch: <b>!заказ Исполнитель - Название</b> (или !заказ и ссылка). <a href="https://www.twitch.tv/popout/'+ch+'/chat?popout=" target="_blank" rel="noopener">Открыть чат ↗</a></div>'}
+function diag(k,extra){const n=$("note");const t=MSG[k]||"";$("note-t").innerHTML=(k==="connecting"||k==="closed"?'<span class="spin">⟳</span> ':"")+esc(t)+(extra?" "+esc(extra):"")+(t&&(k==="timeout"||k==="server"||k==="closed")?chatHint():"");n.classList.toggle("on",!!t)}
 
 /* --- связь с ведущей --- */
 const code=(new URLSearchParams(location.search).get("r")||ls.get(SLUG+"_rq_code")||"").trim();
 if(code)ls.set(SLUG+"_rq_code",code);
 let peer=null,conn=null,rules={cd:30,maxq:3},showQ=true,online=false,got=false,lastSt=null,lastMsg=0,tries=0,retryT=null,connT=null,hiT=null,outbox=null;const pend={};
-var liveF,twCh="",twOn,altI=null,rawSt=null,devTg="",APPV_R="v28.3";
+var liveF,twCh="",twOn,altI=null,rawSt=null,devTg="",APPV_R="v28.3.1";
 function airUi(){const a=$("air"),idle=online&&liveF===false;a.textContent=!online?"● ОФФЛАЙН":idle?"● НЕ В ЭФИРЕ":"● В ЭФИРЕ";a.classList.toggle("live",online&&!idle);a.classList.toggle("idle",idle);a.title=!online?"Панель ведущей не на связи. Нажми, чтобы переподключиться":idle?"Ведущей нет в эфире, но заказы принимаются":"Ведущая в эфире"}
 function setOnline(v){online=v;airUi();if(v)diag("ok")}
 function start(){
@@ -765,7 +759,7 @@ function start(){
   try{peer=new Peer(undefined,ICE);const p=peer;
     p.on("open",connect);
     p.on("disconnected",()=>{try{p.reconnect()}catch(e){}});
-    p.on("error",e=>{if(peer!==p)return;if(e.type==="peer-unavailable"){setOnline(false);diag("offline");retry()}else if(e.type==="browser-incompatible"){diag("nopeer")}else{setOnline(false);retry(true)}})
+    p.on("error",e=>{if(peer!==p)return;if(e.type==="peer-unavailable"){setOnline(false);diag("offline");retry()}else if(e.type==="browser-incompatible"){diag("nopeer")}else{setOnline(false);diag("server",e&&e.type?"("+e.type+")":"");retry(true)}})
   }catch(e){diag("nopeer")}}
 function connect(){clearTimeout(retryT);clearTimeout(connT);clearInterval(hiT);if(!peer||peer.destroyed||!peer.open)return;try{conn&&conn.close()}catch(e){}
   got=false;const c=conn=peer.connect(PFX+code,{reliable:true,metadata:{rq:1}});if(!online)diag("connecting");
