@@ -610,6 +610,13 @@ addEventListener("unhandledrejection",function(e){add("promise: "+String(e.reaso
 <script src="peerjs.min.js"></script>
 <script>window.Peer||document.write('<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"><\/script>')</script>
 <script>window.Peer||document.write('<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"><\/script>');window.Peer||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"><\/script>')</script>
+<script>/* Сервер связи PeerJS. HOST пустой = общий облачный 0.peerjs.com. Свой сервер: впиши адрес без https://, например "hmstr-peer.onrender.com". Для проверки: ?peer=адрес в ссылке (на время вкладки), ?peer=cloud возвращает облако. */
+(function(){var HOST="",PORT=443,PATH="/",KEY="peerjs",BANNER=1,ov="";
+try{var q=new URLSearchParams(location.search).get("peer");if(q){q=q.trim().toLowerCase();if(q==="cloud")sessionStorage.removeItem("_peerhost");else if(/^[a-z0-9.-]+(:\d+)?$/.test(q))sessionStorage.setItem("_peerhost",q)}ov=sessionStorage.getItem("_peerhost")||"";if(ov)HOST=ov}catch(e){}
+var P0=window.Peer;if(!P0)return;var h=HOST,m=h.match(/^(.+):(\d+)$/);if(m){h=m[1];PORT=+m[2]}
+function W(id,opts){opts=Object.assign({},opts||{});if(h){opts.host=h;opts.port=PORT;opts.path=PATH;opts.secure=true;opts.key=KEY}return new P0(id,opts)}
+W.prototype=P0.prototype;for(var k in P0){try{W[k]=P0[k]}catch(e){}}window.Peer=W;window.PEERLBL=h||"облако";
+if(ov&&BANNER)document.addEventListener("DOMContentLoaded",function(){var d=document.createElement("div");d.style.cssText="position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#b45309;color:#fff;font:12px/1.4 system-ui,sans-serif;padding:6px 10px;text-align:center;cursor:pointer";d.textContent="Тестовый сервер связи: "+ov+" (нажми, чтобы скрыть; ?peer=cloud вернёт обычный)";d.onclick=function(){d.remove()};document.body.appendChild(d)})})();</script>
 </head>
 <body>
 <div class="bg"></div>
@@ -748,7 +755,7 @@ function diag(k,extra){const n=$("note");const t=MSG[k]||"";$("note-t").innerHTM
 const code=(new URLSearchParams(location.search).get("r")||ls.get(SLUG+"_rq_code")||"").trim();
 if(code)ls.set(SLUG+"_rq_code",code);
 let peer=null,conn=null,rules={cd:30,maxq:3},showQ=true,online=false,got=false,lastSt=null,lastMsg=0,tries=0,retryT=null,connT=null,hiT=null,outbox=null;const pend={};
-var liveF,twCh="",twOn,altI=null,rawSt=null,devTg="",APPV_R="v28.3.1";
+var liveF,twCh="",twOn,altI=null,rawSt=null,devTg="",APPV_R="v28.4";
 function airUi(){const a=$("air"),idle=online&&liveF===false;a.textContent=!online?"● ОФФЛАЙН":idle?"● НЕ В ЭФИРЕ":"● В ЭФИРЕ";a.classList.toggle("live",online&&!idle);a.classList.toggle("idle",idle);a.title=!online?"Панель ведущей не на связи. Нажми, чтобы переподключиться":idle?"Ведущей нет в эфире, но заказы принимаются":"Ведущая в эфире"}
 function setOnline(v){online=v;airUi();if(v)diag("ok")}
 function start(){
@@ -846,7 +853,7 @@ function fbTech(){const n=navigator,u=n.userAgent||"",c=n.connection||{};let br=
   return{v:APPV_R,ua:br,os,mob:/Mobi|Android|iPhone|iPad/.test(u),on:!!online,age:lastMsg?Math.round((Date.now()-lastMsg)/1000):-1,tr:tries,
     host:String(location.host||"").slice(0,60),scr:(screen.width||0)+"x"+(screen.height||0),vp:(innerWidth||0)+"x"+(innerHeight||0),dpr:+(devicePixelRatio||1).toFixed(2),
     lang:String(n.language||"").slice(0,10),tz:-new Date().getTimezoneOffset()/60,net:String(c.effectiveType||"").slice(0,8),
-    th:String(document.documentElement.getAttribute("data-theme")||"").slice(0,12),up:Math.round(performance.now()/1000),err:(window.__errs||[]).slice(-5)}}
+    th:String(document.documentElement.getAttribute("data-theme")||"").slice(0,12),up:Math.round(performance.now()/1000),err:(window.__errs||[]).slice(-5),srv:String(window.PEERLBL||"").slice(0,40)}}
 async function fbSend(){const st=$("fb-st"),t=($("fb-t").value||"").trim();if(t.length<5){st.textContent="Напиши хотя бы пару слов";return}
   if(Date.now()-(+ls.get(SLUG+"_rq_fbt")||0)<30000){st.textContent="Подожди полминуты перед следующим сообщением";return}
   const nick=($("f-n").value||"").trim().slice(0,25),tech=$("fb-tech").checked?fbTech():null;

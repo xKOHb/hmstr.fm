@@ -752,6 +752,13 @@ function done(m){clean();if(m)alert(m);location.reload()}
 <script src="peerjs.min.js"></script>
 <script>window.Peer||document.write('<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"><\/script>')</script>
 <script>window.Peer||document.write('<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"><\/script>');window.Peer||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"><\/script>')</script>
+<script>/* Сервер связи PeerJS. HOST пустой = общий облачный 0.peerjs.com. Свой сервер: впиши адрес без https://, например "hmstr-peer.onrender.com". Для проверки: ?peer=адрес в ссылке (на время вкладки), ?peer=cloud возвращает облако. */
+(function(){var HOST="",PORT=443,PATH="/",KEY="peerjs",BANNER=1,ov="";
+try{var q=new URLSearchParams(location.search).get("peer");if(q){q=q.trim().toLowerCase();if(q==="cloud")sessionStorage.removeItem("_peerhost");else if(/^[a-z0-9.-]+(:\d+)?$/.test(q))sessionStorage.setItem("_peerhost",q)}ov=sessionStorage.getItem("_peerhost")||"";if(ov)HOST=ov}catch(e){}
+var P0=window.Peer;if(!P0)return;var h=HOST,m=h.match(/^(.+):(\d+)$/);if(m){h=m[1];PORT=+m[2]}
+function W(id,opts){opts=Object.assign({},opts||{});if(h){opts.host=h;opts.port=PORT;opts.path=PATH;opts.secure=true;opts.key=KEY}return new P0(id,opts)}
+W.prototype=P0.prototype;for(var k in P0){try{W[k]=P0[k]}catch(e){}}window.Peer=W;window.PEERLBL=h||"облако";
+if(ov&&BANNER)document.addEventListener("DOMContentLoaded",function(){var d=document.createElement("div");d.style.cssText="position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#b45309;color:#fff;font:12px/1.4 system-ui,sans-serif;padding:6px 10px;text-align:center;cursor:pointer";d.textContent="Тестовый сервер связи: "+ov+" (нажми, чтобы скрыть; ?peer=cloud вернёт обычный)";d.onclick=function(){d.remove()};document.body.appendChild(d)})})();</script>
 <script>window.SFX_KEY="hmstr_cfg"</script>
 <script>function rootUrl(){return location.origin+location.pathname.replace(/[^/]*$/,"").replace(/\/$/,"")}</script>
 <script src="sfx.js"></script>
@@ -1034,7 +1041,7 @@ $("d-imp").onclick=()=>$("d-file").click();
 $("d-file").onchange=async e=>{try{const j=JSON.parse(await e.target.files[0].text());if(j.S){S=fixS(j.S);save()}if(Array.isArray(j.arch)&&j.arch.length)ls.set("hmstr_arch",JSON.stringify(j.arch.slice(-60)));if(j.cfg){const{room:_r,coKey:_k,coOpen:_o,pubCode:_pc,...jc}=j.cfg;Object.assign(cfg,jc);cfgSave();location.reload();return}show();toast("Импортировано ✓")}catch(x){toast("Не удалось прочитать файл")}};
 /* v26: название по ссылке через сервер (/api/meta), если oEmbed из браузера не ответил */
 const MAINO="https://hmstrfm.vercel.app",DEFCH="h_mst_r";
-const APPV="v28.3";
+const APPV="v28.4";
 async function metaApi(u){const bases=[""];try{if(MAINO&&location.origin!==MAINO)bases.push(MAINO)}catch(e){}
   for(const b of bases){if(!b&&!/^https?:$/.test(location.protocol))continue;try{const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),6000),r=await fetch(b+"/api/meta?url="+encodeURIComponent(u),{signal:ctl.signal});clearTimeout(tm);if(!r.ok)continue;const j=await r.json();if(j&&j.ok&&j.title)return j}catch(e){}}return null}
 /* oEmbed: название и обложка для Spotify / SoundCloud */
@@ -1606,7 +1613,7 @@ const dgT=(p,ms)=>Promise.race([p,new Promise(r=>setTimeout(()=>r("таймау�
 async function dgRun(){const out=$("dg-out"),L=[],put=(ok,n,d)=>{L.push((ok===null?"ℹ️ ":ok?"✅ ":"❌ ")+n+(d?" — "+d:""));out.textContent=L.join("\n")};
   L.push("Версия "+APPV+" · "+location.origin+" · "+((navigator.userAgent||"").match(/(Edg|Chrome|Firefox|Safari)\/[\d.]+/)||["браузер ?"])[0]);out.textContent=L.join("\n");$("dg-run").disabled=true;
   try{put(!!window.Peer,"Библиотека PeerJS",window.Peer?"загружена":"не загрузилась (CDN недоступен: положи peerjs.min.js рядом с index.html)");
-    if(window.Peer){const t0=Date.now(),r=await dgT(new Promise(res=>{let p;try{p=new Peer(undefined,{config:PUBICE.config})}catch(e){return res("ошибка")}p.on("open",()=>{res(true);try{p.destroy()}catch(e){}});p.on("error",e=>{res(e&&e.type||"ошибка");try{p.destroy()}catch(x){}})}),9000);put(r===true,"Сервер синхронизации PeerJS (оверлей, сайт заказов)",r===true?(Date.now()-t0)+" мс":String(r))}
+    if(window.Peer){const t0=Date.now(),r=await dgT(new Promise(res=>{let p;try{p=new Peer(undefined,{config:PUBICE.config})}catch(e){return res("ошибка")}p.on("open",()=>{res(true);try{p.destroy()}catch(e){}});p.on("error",e=>{res(e&&e.type||"ошибка");try{p.destroy()}catch(x){}})}),9000);put(r===true,"Сервер синхронизации PeerJS ["+(window.PEERLBL||"?")+"] (оверлей, сайт заказов)",r===true?(Date.now()-t0)+" мс":String(r))}
     {const t0=Date.now(),r=await dgT(new Promise(res=>{let w;try{w=new WebSocket("wss://irc-ws.chat.twitch.tv")}catch(e){return res("ошибка")}w.onopen=()=>{res(true);try{w.close()}catch(e){}};w.onerror=()=>res("не открылось")}),7000);put(r===true,"Чат Twitch (заявки из чата)",r===true?(Date.now()-t0)+" мс":String(r))}
     {const t0=Date.now(),r=await dgT(fetch("https://www.youtube.com/generate_204",{mode:"no-cors",cache:"no-store"}).then(()=>true,()=>"нет доступа"),7000);put(r===true,"YouTube",r===true?(Date.now()-t0)+" мс":String(r))}
     {const j=await metaApi("https://www.youtube.com/watch?v=dQw4w9WgXcQ");put(j?true:null,"Сервер названий /api/meta",j?"работает":"недоступен (названия возьмутся из oEmbed)")}

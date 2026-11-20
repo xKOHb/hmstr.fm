@@ -51,7 +51,7 @@ module.exports = async (req, res) => {
       dim(t.scr) ? "экран " + dim(t.scr) : "", dim(t.vp) ? "окно " + dim(t.vp) + (dpr && dpr !== 1 ? " ×" + dpr : "") : "",
       clean(t.lang, 10), tz !== null ? "UTC" + (tz >= 0 ? "+" : "") + tz : ""]);
     const up = num(t.up);
-    add("🌐", [clean(t.host, 60), clean(t.net, 8) ? "сеть " + clean(t.net, 8) : "", clean(t.th, 12) ? "тема " + clean(t.th, 12) : "", up !== null ? "на странице " + up + " с" : ""]);
+    add("🌐", [clean(t.host, 60), clean(t.srv, 40) ? "связь: " + clean(t.srv, 40) : "", clean(t.net, 8) ? "сеть " + clean(t.net, 8) : "", clean(t.th, 12) ? "тема " + clean(t.th, 12) : "", up !== null ? "на странице " + up + " с" : ""]);
     if (typeof t.on === "boolean") {
       const age = num(t.age), tr = num(t.tr);
       let p;

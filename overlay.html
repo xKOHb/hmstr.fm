@@ -310,6 +310,13 @@ html.lite .sc-ring{display:none}
 </div>
 <script src="peerjs.min.js"></script>
 <script>window.Peer||document.write('<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"><\/script>')</script>
+<script>/* Сервер связи PeerJS. HOST пустой = общий облачный 0.peerjs.com. Свой сервер: впиши адрес без https://, например "hmstr-peer.onrender.com". Для проверки: ?peer=адрес в ссылке (на время вкладки), ?peer=cloud возвращает облако. */
+(function(){var HOST="",PORT=443,PATH="/",KEY="peerjs",BANNER=0,ov="";
+try{var q=new URLSearchParams(location.search).get("peer");if(q){q=q.trim().toLowerCase();if(q==="cloud")sessionStorage.removeItem("_peerhost");else if(/^[a-z0-9.-]+(:\d+)?$/.test(q))sessionStorage.setItem("_peerhost",q)}ov=sessionStorage.getItem("_peerhost")||"";if(ov)HOST=ov}catch(e){}
+var P0=window.Peer;if(!P0)return;var h=HOST,m=h.match(/^(.+):(\d+)$/);if(m){h=m[1];PORT=+m[2]}
+function W(id,opts){opts=Object.assign({},opts||{});if(h){opts.host=h;opts.port=PORT;opts.path=PATH;opts.secure=true;opts.key=KEY}return new P0(id,opts)}
+W.prototype=P0.prototype;for(var k in P0){try{W[k]=P0[k]}catch(e){}}window.Peer=W;window.PEERLBL=h||"облако";
+if(ov&&BANNER)document.addEventListener("DOMContentLoaded",function(){var d=document.createElement("div");d.style.cssText="position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#b45309;color:#fff;font:12px/1.4 system-ui,sans-serif;padding:6px 10px;text-align:center;cursor:pointer";d.textContent="Тестовый сервер связи: "+ov+" (нажми, чтобы скрыть; ?peer=cloud вернёт обычный)";d.onclick=function(){d.remove()};document.body.appendChild(d)})})();</script>
 <script>window.SFX_KEY="hmstr_cfg"</script>
 <script src="sfx.js"></script>
 <script>
